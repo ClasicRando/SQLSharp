@@ -3,6 +3,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSharp", "SQLSharp\SQLSha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSharp.Examples", "SQLSharp.Examples\SQLSharp.Examples.csproj", "{F3DCD364-0C99-43A7-A0E6-701C7E247C7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSharp.Generator", "SQLSharp.Generator\SQLSharp.Generator.csproj", "{D69D6FF5-27CB-4D9F-8509-2AAE31581541}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSharp.Generator.Tests", "SQLSharp.Generator.Tests\SQLSharp.Generator.Tests.csproj", "{EA0632D4-B260-4E93-A171-22292682C410}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,5 +25,9 @@ Global
 		{D69D6FF5-27CB-4D9F-8509-2AAE31581541}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D69D6FF5-27CB-4D9F-8509-2AAE31581541}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D69D6FF5-27CB-4D9F-8509-2AAE31581541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0632D4-B260-4E93-A171-22292682C410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0632D4-B260-4E93-A171-22292682C410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0632D4-B260-4E93-A171-22292682C410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0632D4-B260-4E93-A171-22292682C410}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

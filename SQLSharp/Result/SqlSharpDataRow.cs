@@ -1,3 +1,5 @@
+using SQLSharp.Exceptions;
+
 namespace SQLSharp.Result;
 
 public class SqlSharpDataRow : IDataRow
@@ -14,7 +16,13 @@ public class SqlSharpDataRow : IDataRow
     public int IndexOf(string fieldName)
     {
         ArgumentNullException.ThrowIfNull(fieldName);
-        return _fieldNames.IndexOf(fieldName);
+        var index = _fieldNames.IndexOf(fieldName);
+        if (index == -1)
+        {
+            throw new SqlSharpException($"Could not find field '{fieldName}' in result");
+        }
+
+        return index;
     }
 
     public object? this[int index] => _values[index];
