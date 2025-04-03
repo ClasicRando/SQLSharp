@@ -5,6 +5,8 @@
         <RootNamespace>SQLSharp</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <IsTrimable>true</IsTrimable>
+        <EnableAotAnalyzer>true</EnableAotAnalyzer>
     </PropertyGroup>
 
 </Project>

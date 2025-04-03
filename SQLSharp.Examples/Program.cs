@@ -1,7 +1,6 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using Npgsql;
+﻿using Npgsql;
 using SQLSharp.Extensions;
+using SQLSharp.Generator.Result;
 using SQLSharp.Result;
 
 var builder = new NpgsqlConnectionStringBuilder
@@ -27,25 +26,34 @@ var rows = connection.QueryAsync<Row>(
         '2025-03-28'::timestamp as date_of_birth
     """);
 
-await foreach (var row in rows)
+await foreach (Row row in rows)
 {
     Console.WriteLine(row.ToString());
 }
 
-internal readonly struct Row : IFromRow<Row>
-{
-    private Guid Id { get; init; }
-    
-    private string Name { get; init; }
-    
-    private byte Age { get; init; }
-    
-    private DateTime DateOfBirth { get; init; }
+var generatedRows = connection.QueryAsync<GeneratedRow>(
+    """
+    SELECT
+        gen_random_uuid() as id,
+        'Name' as name,
+        0 as "age",
+        '2025-03-28'::timestamp as date_of_birth
+    """);
 
-    public override string ToString()
-    {
-        return $"Row[Id={Id},Name={Name},Age={Age},DateOfBirth={DateOfBirth}]";
-    }
+await foreach (GeneratedRow row in generatedRows)
+{
+    Console.WriteLine(row.ToString());
+}
+
+internal readonly record struct Row : IFromRow<Row>
+{
+    public Guid Id { get; init; }
+    
+    public string Name { get; init; }
+    
+    public byte Age { get; init; }
+    
+    public DateTime DateOfBirth { get; init; }
 
     public static Row FromRow(IDataRow row)
     {
@@ -56,5 +64,18 @@ internal readonly struct Row : IFromRow<Row>
             Age = row.GetFieldNotNull<byte>("age"),
             DateOfBirth = row.GetFieldNotNull<DateTime>("date_of_birth"),
         };
+    }
+}
+
+[FromRow]
+internal readonly partial struct GeneratedRow(
+    Guid id,
+    string name,
+    byte age,
+    [Column(Name = "date_of_birth")] DateTime? dateOfBirth)
+{
+    public override string ToString()
+    {
+        return $"GeneratedRow[id={id},name={name},age={age},dateOfBirth={dateOfBirth}]";
     }
 }
