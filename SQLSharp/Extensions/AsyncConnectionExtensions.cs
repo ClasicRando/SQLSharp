@@ -31,7 +31,7 @@ public static class AsyncConnectionExtensions
         return QueryScalarAsyncImpl<T, T>(command, cancellationToken);
     }
 
-    public static async Task<T?> QueryScalarAsync<T>(
+    public static async Task<T?> QueryScalarValueAsync<T>(
         this DbConnection connection,
         string query,
         object? parameters = null,
@@ -39,6 +39,8 @@ public static class AsyncConnectionExtensions
         int? queryTimeout = null,
         CommandType? commandType = null,
         CancellationToken cancellationToken = default)
+        where
+        T : struct
     {
         SqlSharpCommand<DbConnection, DbTransaction> command = new(
             connection,
@@ -47,47 +49,28 @@ public static class AsyncConnectionExtensions
             transaction,
             queryTimeout,
             commandType);
-        object? result = typeof(T) switch
-        {
-            var cls when cls == typeof(bool) => await QueryScalarAsyncImpl<SqlBoolean, bool?>(
-                command, cancellationToken),
-            var cls when cls == typeof(byte[]) => await QueryScalarAsyncImpl<SqlBinary, byte[]?>(
-                command, cancellationToken),
-            var cls when cls == typeof(byte) => await QueryScalarAsyncImpl<SqlByte, byte?>(command,
-                cancellationToken),
-            var cls when cls == typeof(char[]) => await QueryScalarAsyncImpl<SqlCharArray, char[]?>(
-                command, cancellationToken),
-            var cls when cls == typeof(DateTime) => await
-                QueryScalarAsyncImpl<SqlDateTime, DateTime?>(command, cancellationToken),
-            var cls when cls == typeof(DateTimeOffset) => await
-                QueryScalarAsyncImpl<SqlDateTimeOffset, DateTimeOffset?>(command,
-                    cancellationToken),
-            var cls when cls == typeof(decimal) => await QueryScalarAsyncImpl<SqlDecimal, decimal?>(
-                command, cancellationToken),
-            var cls when cls == typeof(double) => await QueryScalarAsyncImpl<SqlDouble, double?>(
-                command, cancellationToken),
-            var cls when cls == typeof(Guid) => await QueryScalarAsyncImpl<SqlGuid, Guid?>(command,
-                cancellationToken),
-            var cls when cls == typeof(int) => await QueryScalarAsyncImpl<SqlInt, int?>(command,
-                cancellationToken),
-            var cls when cls == typeof(long) => await QueryScalarAsyncImpl<SqlLong, long?>(command,
-                cancellationToken),
-            var cls when cls == typeof(short) => await QueryScalarAsyncImpl<SqlShort, short?>(
-                command, cancellationToken),
-            var cls when cls == typeof(float) => await QueryScalarAsyncImpl<SqlSingle, float?>(
-                command, cancellationToken),
-            var cls when cls == typeof(string) => await QueryScalarAsyncImpl<SqlString, string?>(
-                command, cancellationToken),
-            var cls when cls == typeof(uint) => await QueryScalarAsyncImpl<SqlUInt, uint?>(command,
-                cancellationToken),
-            var cls when cls == typeof(ulong) => await QueryScalarAsyncImpl<SqlULong, ulong?>(
-                command, cancellationToken),
-            var cls when cls == typeof(ushort) => await QueryScalarAsyncImpl<SqlUShort, ushort?>(
-                command, cancellationToken),
-            _ => throw new SqlSharpException($"Cannot execute scalar query for type {typeof(T)}"),
-        };
+        return await QueryScalarAsyncImpl<AnyDbDecode<T>, T?>(command, cancellationToken);
+    }
 
-        return (T?)Convert.ChangeType(result, typeof(T));
+    public static async Task<T?> QueryScalarAsync<T>(
+        this DbConnection connection,
+        string query,
+        object? parameters = null,
+        DbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
+        where
+        T : class
+    {
+        SqlSharpCommand<DbConnection, DbTransaction> command = new(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType);
+        return await QueryScalarAsyncImpl<AnyRefDbDecode<T>, T?>(command, cancellationToken);
     }
 
     public static async Task<T> QuerySingleAsync<T>(
@@ -129,7 +112,7 @@ public static class AsyncConnectionExtensions
             cancellationToken
         );
         var enumerator = rows.GetAsyncEnumerator(cancellationToken);
-        var result = await enumerator.MoveNextAsync() ? enumerator.Current : default;
+        T? result = await enumerator.MoveNextAsync() ? enumerator.Current : default;
         if (await enumerator.MoveNextAsync())
         {
             throw new SqlSharpException("Expected exactly 1 row but found more than 1");
@@ -226,7 +209,7 @@ public static class AsyncConnectionExtensions
             reader = await command.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
             if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false)) yield break;
 
-            var schemaColumns =
+            DataTable? schemaColumns =
                 await reader.GetSchemaTableAsync(cancellationToken).ConfigureAwait(false);
             var columnNameQuery = from DataRow column in schemaColumns!.Rows
                 select column.Field<string>("ColumnName");
@@ -292,7 +275,8 @@ public static class AsyncConnectionExtensions
         SqlSharpCommand<DbConnection, DbTransaction> command,
         CancellationToken cancellationToken) where TDecoder : IDbDecode<TResult>
     {
-        var row = await QueryFirstOrNullAsyncImpl<ScalarResultRow<TDecoder, TResult>>(command,
+        var row = await QueryFirstOrNullAsyncImpl<ScalarResultRow<TDecoder, TResult>>(
+            command,
             cancellationToken);
         return row is null ? default : row.Inner;
     }

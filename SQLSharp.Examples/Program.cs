@@ -13,7 +13,7 @@ var builder = new NpgsqlConnectionStringBuilder
 };
 await using var connection = new NpgsqlConnection(builder.ToString());
 
-var value = connection.QueryScalar<int>("SELECT 1");
+var value = connection.QueryScalarValue<int>("SELECT 1");
 
 Console.WriteLine($"Value: {value}");
 

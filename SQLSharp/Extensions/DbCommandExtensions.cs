@@ -10,12 +10,12 @@ public static class DbCommandExtensions
 {
     internal static void AddParameters(this IDbCommand command, object parameters)
     {
-        var type = parameters.GetType();
+        Type type = parameters.GetType();
         if (parameters is IEnumerable<KeyValuePair<string, object?>> keyValuePairs)
         {
             foreach (var pair in keyValuePairs)
             {
-                var parameter = command.CreateParameter();
+                IDbDataParameter parameter = command.CreateParameter();
                 parameter.ParameterName = pair.Key;
                 EncodeValue(ref parameter, pair.Value);
                 command.Parameters.Add(parameter);
@@ -23,9 +23,9 @@ public static class DbCommandExtensions
         }
         else if (CheckIfAnonymousType(type))
         {
-            foreach (var propertyInfo in type.GetProperties())
+            foreach (PropertyInfo propertyInfo in type.GetProperties())
             {
-                var parameter = command.CreateParameter();
+                IDbDataParameter parameter = command.CreateParameter();
                 parameter.ParameterName = propertyInfo.Name;
                 var parameterValue = propertyInfo.GetValue(parameters);
                 EncodeValue(ref parameter, parameterValue);

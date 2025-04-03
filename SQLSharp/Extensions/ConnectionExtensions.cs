@@ -26,13 +26,15 @@ public static class ConnectionExtensions
         return QueryScalarImpl<T, T>(command);
     }
 
-    public static T? QueryScalar<T>(
+    public static T? QueryScalarValue<T>(
         this IDbConnection connection,
         string query,
         object? parameters = null,
         IDbTransaction? transaction = null,
         int? queryTimeout = null,
         CommandType? commandType = null)
+        where
+        T : struct
     {
         SqlSharpCommand<IDbConnection, IDbTransaction> command = new(
             connection,
@@ -41,31 +43,27 @@ public static class ConnectionExtensions
             transaction,
             queryTimeout,
             commandType);
-        object? result = typeof(T) switch
-        {
-            var cls when cls == typeof(bool) => QueryScalarImpl<SqlBoolean, bool?>(command),
-            var cls when cls == typeof(byte[]) => QueryScalarImpl<SqlBinary, byte[]?>(command),
-            var cls when cls == typeof(byte) => QueryScalarImpl<SqlByte, byte?>(command),
-            var cls when cls == typeof(char[]) => QueryScalarImpl<SqlCharArray, char[]?>(command),
-            var cls when cls == typeof(DateTime) =>
-                QueryScalarImpl<SqlDateTime, DateTime?>(command),
-            var cls when cls == typeof(DateTimeOffset) =>
-                QueryScalarImpl<SqlDateTimeOffset, DateTimeOffset?>(command),
-            var cls when cls == typeof(decimal) => QueryScalarImpl<SqlDecimal, decimal?>(command),
-            var cls when cls == typeof(double) => QueryScalarImpl<SqlDouble, double?>(command),
-            var cls when cls == typeof(Guid) => QueryScalarImpl<SqlGuid, Guid?>(command),
-            var cls when cls == typeof(int) => QueryScalarImpl<SqlInt, int?>(command),
-            var cls when cls == typeof(long) => QueryScalarImpl<SqlLong, long?>(command),
-            var cls when cls == typeof(short) => QueryScalarImpl<SqlShort, short?>(command),
-            var cls when cls == typeof(float) => QueryScalarImpl<SqlSingle, float?>(command),
-            var cls when cls == typeof(string) => QueryScalarImpl<SqlString, string?>(command),
-            var cls when cls == typeof(uint) => QueryScalarImpl<SqlUInt, uint?>(command),
-            var cls when cls == typeof(ulong) => QueryScalarImpl<SqlULong, ulong?>(command),
-            var cls when cls == typeof(ushort) => QueryScalarImpl<SqlUShort, ushort?>(command),
-            _ => throw new SqlSharpException($"Cannot execute scalar query for type {typeof(T)}"),
-        };
+        return QueryScalarImpl<AnyDbDecode<T>, T?>(command);
+    }
 
-        return (T?)Convert.ChangeType(result, typeof(T));
+    public static T? QueryScalar<T>(
+        this IDbConnection connection,
+        string query,
+        object? parameters = null,
+        IDbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null)
+        where
+        T : class
+    {
+        SqlSharpCommand<IDbConnection, IDbTransaction> command = new(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType);
+        return QueryScalarImpl<AnyRefDbDecode<T>, T?>(command);
     }
 
     public static T QuerySingle<T>(
