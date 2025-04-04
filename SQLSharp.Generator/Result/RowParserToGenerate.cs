@@ -9,6 +9,7 @@ public record RowParserToGenerate
     public string Namespace { get; }
     public bool IsPartial { get; }
     public bool IsStruct { get; }
+    public Rename Rename { get; }
     public ImmutableArray<ConstructorData> Constructors { get; }
     public ImmutableArray<ISymbol> Members { get; }
 
@@ -17,6 +18,7 @@ public record RowParserToGenerate
         string typeNamespace,
         bool isPartial,
         bool isStruct,
+        Rename? rename,
         ImmutableArray<ConstructorData> constructors,
         ImmutableArray<ISymbol> members)
     {
@@ -24,6 +26,7 @@ public record RowParserToGenerate
         Namespace = typeNamespace;
         IsPartial = isPartial;
         IsStruct = isStruct;
+        Rename = rename ?? Rename.None;
         Constructors = constructors;
         Members = members;
     }

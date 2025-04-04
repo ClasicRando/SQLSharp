@@ -67,11 +67,8 @@ internal readonly record struct Row : IFromRow<Row>
     }
 }
 
-[FromRow]
-internal readonly partial struct InnerRow(
-    string name,
-    byte age,
-    [Column(Name = "date_of_birth")] DateTime? dateOfBirth)
+[FromRow(RenameAll = "snake_case")]
+internal readonly partial struct InnerRow(string name, byte age, DateTime? dateOfBirth)
 {
     public override string ToString()
     {

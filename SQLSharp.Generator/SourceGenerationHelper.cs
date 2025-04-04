@@ -31,9 +31,10 @@ public static class SourceGenerationHelper
 
         namespace SQLSharp.Generator.Result;
 
-        [global::System.AttributeUsage(validOn: global::System.AttributeTargets.Class | global::System.AttributeTargets.Struct, AllowMultiple = true)]
-        sealed class FromRowAttribute : global::System.Attribute
+        [global::System.AttributeUsage(validOn: global::System.AttributeTargets.Class | global::System.AttributeTargets.Struct)]
+        public sealed class FromRowAttribute : global::System.Attribute
         {
+            public string RenameAll { get; set; } = string.Empty;
         }
         """;
 
@@ -44,8 +45,8 @@ public static class SourceGenerationHelper
 
         namespace SQLSharp.Generator.Result;
 
-        [global::System.AttributeUsage(validOn: global::System.AttributeTargets.Parameter | global::System.AttributeTargets.Property, AllowMultiple = true)]
-        sealed class ColumnAttribute : global::System.Attribute
+        [global::System.AttributeUsage(validOn: global::System.AttributeTargets.Parameter | global::System.AttributeTargets.Property)]
+        public sealed class ColumnAttribute : global::System.Attribute
         {
             public string Name { get; set; } = string.Empty;
             public bool Flatten { get; set; } = false;
@@ -126,7 +127,9 @@ public static class SourceGenerationHelper
             builder.Append(typeName);
             builder.Append('>');
             builder.Append("(\"");
-            builder.Append(parameter.ResultFieldName);
+            var fieldName = rowParserToGenerate.Rename
+                .TransformRowFieldName(parameter.ResultFieldName);
+            builder.Append(fieldName);
             builder.Append("\")");
 
             if (index >= constructor.Parameters.Length - 1) continue;

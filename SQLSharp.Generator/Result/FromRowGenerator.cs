@@ -11,6 +11,7 @@ namespace SQLSharp.Generator.Result;
 public class FromRowGenerator : IIncrementalGenerator
 {
     private const string ColumnAttributeName = "SQLSharp.Generator.Result.ColumnAttribute";
+    private const string FromRowAttributeName = "SQLSharp.Generator.Result.FromRowAttribute";
     
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -78,6 +79,21 @@ public class FromRowGenerator : IIncrementalGenerator
         {
             return null;
         }
+
+        INamedTypeSymbol? fromRowAttribute = compilation.GetTypeByMetadataName(FromRowAttributeName);
+        if (fromRowAttribute is null)
+        {
+            return null;
+        }
+
+        var rename = typeSymbol.GetAttributes()
+            .FirstOrDefault(a =>
+                fromRowAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default))
+            ?.NamedArguments
+            .Where(na => na.Key == "RenameAll")
+            .Select(na => na.Value.Value?.ToString())
+            .FirstOrDefault()
+            ?.ParseToRename();
         
         return new RowParserToGenerate(
             typeSymbol.Name,
@@ -86,6 +102,7 @@ public class FromRowGenerator : IIncrementalGenerator
                 s.GetSyntax() is BaseTypeDeclarationSyntax declaration &&
                 declaration.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword))),
             typeSymbol.IsValueType,
+            rename,
             typeSymbol.Constructors
                 .Select(c => ConstructorData.FromMethodSymbol(c, columnAttribute))
                 .ToImmutableArray(),
