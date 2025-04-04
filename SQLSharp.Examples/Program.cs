@@ -68,14 +68,24 @@ internal readonly record struct Row : IFromRow<Row>
 }
 
 [FromRow]
-internal readonly partial struct GeneratedRow(
-    Guid id,
+internal readonly partial struct InnerRow(
     string name,
     byte age,
     [Column(Name = "date_of_birth")] DateTime? dateOfBirth)
 {
     public override string ToString()
     {
-        return $"GeneratedRow[id={id},name={name},age={age},dateOfBirth={dateOfBirth}]";
+        return $"InnerRow[name={name},age={age},dateOfBirth={dateOfBirth}]";
+    }
+}
+
+[FromRow]
+internal readonly partial struct GeneratedRow(
+    Guid id,
+    [Column(Flatten = true)] InnerRow innerRow)
+{
+    public override string ToString()
+    {
+        return $"GeneratedRow[id={id},innerRow={innerRow}]";
     }
 }

@@ -26,11 +26,19 @@ public record ConstructorData
 public record ParameterData
 {
     public string Name { get; }
+    public string ResultFieldName { get; }
+    public bool Flatten { get; }
     public ParameterTypeData TypeData { get; }
 
-    private ParameterData(string name, ParameterTypeData typeData)
+    private ParameterData(
+        string name,
+        string resultFieldName,
+        bool flatten,
+        ParameterTypeData typeData)
     {
         Name = name;
+        ResultFieldName = resultFieldName;
+        Flatten = flatten;
         TypeData = typeData;
     }
     
@@ -38,17 +46,39 @@ public record ParameterData
         IParameterSymbol parameterSymbol,
         INamedTypeSymbol columnAttribute)
     {
-        var name = parameterSymbol
+        AttributeData? attributeData = parameterSymbol
             .GetAttributes()
-            .Where(a => columnAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default))
-            .Select(a =>
+            .FirstOrDefault(a => columnAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default));
+        var resultFieldName = parameterSymbol.Name;
+        var flatten = false;
+        if (attributeData is not null)
+        {
+            foreach (var kvp in attributeData.NamedArguments)
             {
-                return a.NamedArguments
-                    .Where(na => na.Key == "Name")
-                    .Select(na => na.Value.Value?.ToString())
-                    .FirstOrDefault();
-            })
-            .FirstOrDefault(name => name is not null) ?? parameterSymbol.Name;
+                var value = kvp.Value.Value;
+                switch (kvp.Key)
+                {
+                    case "Name":
+                    {
+                        var attributeName = value?.ToString();
+                        if (string.IsNullOrEmpty(attributeName))
+                        {
+                            continue;
+                        }
+                        resultFieldName = attributeName!;
+                        break;
+                    }
+                    case "Flatten":
+                    {
+                        if (value is bool b)
+                        {
+                            flatten = b;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
         var isNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
         var typeName = isNullable
             ? ((INamedTypeSymbol)parameterSymbol.Type).TypeArguments.First().Name
@@ -58,7 +88,7 @@ public record ParameterData
             parameterSymbol.Type.ContainingNamespace.Name,
             parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
             parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated);
-        return new ParameterData(name, typeData);
+        return new ParameterData(parameterSymbol.Name, resultFieldName, flatten, typeData);
     }
 }
 

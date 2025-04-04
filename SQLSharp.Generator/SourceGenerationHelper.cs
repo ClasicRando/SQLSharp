@@ -47,7 +47,8 @@ public static class SourceGenerationHelper
         [global::System.AttributeUsage(validOn: global::System.AttributeTargets.Parameter | global::System.AttributeTargets.Property, AllowMultiple = true)]
         sealed class ColumnAttribute : global::System.Attribute
         {
-            public string? Name { get; set; } = null;
+            public string Name { get; set; } = string.Empty;
+            public bool Flatten { get; set; } = false;
         }
         """;
 
@@ -97,7 +98,18 @@ public static class SourceGenerationHelper
                 parameterNamespaces.Add(parameter.TypeData.ContainingNamespace);
             }
 
+            builder.Append(parameter.Name);
+            builder.Append(": ");
+            
             var typeName = parameter.TypeData.Name;
+
+            if (parameter.Flatten)
+            {
+                builder.Append(typeName);
+                builder.Append(".FromRow(row)");
+                continue;
+            }
+
 
             builder.Append("row.GetField");
             if (parameter.TypeData.IsRefType)
@@ -114,7 +126,7 @@ public static class SourceGenerationHelper
             builder.Append(typeName);
             builder.Append('>');
             builder.Append("(\"");
-            builder.Append(parameter.Name);
+            builder.Append(parameter.ResultFieldName);
             builder.Append("\")");
 
             if (index >= constructor.Parameters.Length - 1) continue;
