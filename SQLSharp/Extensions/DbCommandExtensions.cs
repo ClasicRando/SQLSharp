@@ -1,6 +1,7 @@
 using System.Data;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using SQLSharp.Command;
 using SQLSharp.Exceptions;
 using SQLSharp.Types;
 
@@ -11,31 +12,44 @@ public static class DbCommandExtensions
     internal static void AddParameters(this IDbCommand command, object parameters)
     {
         Type type = parameters.GetType();
-        if (parameters is IEnumerable<KeyValuePair<string, object?>> keyValuePairs)
+        switch (parameters)
         {
-            foreach (var pair in keyValuePairs)
+            case SqlSharpParameters sqlSharpParameters:
+                sqlSharpParameters.AddToCommand(command);
+                break;
+            case IEnumerable<KeyValuePair<string, object?>> keyValuePairs:
             {
-                IDbDataParameter parameter = command.CreateParameter();
-                parameter.ParameterName = pair.Key;
-                EncodeValue(ref parameter, pair.Value);
-                command.Parameters.Add(parameter);
+                foreach (var pair in keyValuePairs)
+                {
+                    IDbDataParameter parameter = command.CreateParameter();
+                    parameter.ParameterName = pair.Key;
+                    EncodeValue(ref parameter, pair.Value);
+                    command.Parameters.Add(parameter);
+                }
+
+                break;
             }
-        }
-        else if (CheckIfAnonymousType(type))
-        {
-            foreach (PropertyInfo propertyInfo in type.GetProperties())
+            default:
             {
-                IDbDataParameter parameter = command.CreateParameter();
-                parameter.ParameterName = propertyInfo.Name;
-                var parameterValue = propertyInfo.GetValue(parameters);
-                EncodeValue(ref parameter, parameterValue);
-                command.Parameters.Add(parameter);
+                if (CheckIfAnonymousType(type))
+                {
+                    foreach (PropertyInfo propertyInfo in type.GetProperties())
+                    {
+                        IDbDataParameter parameter = command.CreateParameter();
+                        parameter.ParameterName = propertyInfo.Name;
+                        var parameterValue = propertyInfo.GetValue(parameters);
+                        EncodeValue(ref parameter, parameterValue);
+                        command.Parameters.Add(parameter);
+                    }
+                }
+                else
+                {
+                    throw new SqlSharpException(
+                        $"Parameters supplied in unexpected type. Expected KeyValuePairs or an anonymous type but found {type}");
+                }
+
+                break;
             }
-        }
-        else
-        {
-            throw new SqlSharpException(
-                $"Parameters supplied in unexpected type. Expected KeyValuePairs or an anonymous type but found {type}");
         }
     }
 
