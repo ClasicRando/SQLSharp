@@ -10,7 +10,7 @@ namespace SQLSharp.Extensions;
 
 public static class AsyncConnectionExtensions
 {
-    public static Task<T?> QueryScalarDecodeAsync<T>(
+    public static Task<T> QueryScalarDecodeAsync<T>(
         this DbConnection connection,
         string query,
         object? parameters = null,
@@ -31,7 +31,7 @@ public static class AsyncConnectionExtensions
         return QueryScalarAsyncImpl<T, T>(command, cancellationToken);
     }
 
-    public static async Task<T?> QueryScalarValueAsync<T>(
+    public static async Task<T> QueryScalarAsync<T>(
         this DbConnection connection,
         string query,
         object? parameters = null,
@@ -39,8 +39,6 @@ public static class AsyncConnectionExtensions
         int? queryTimeout = null,
         CommandType? commandType = null,
         CancellationToken cancellationToken = default)
-        where
-        T : struct
     {
         SqlSharpCommand<DbConnection, DbTransaction> command = new(
             connection,
@@ -49,28 +47,7 @@ public static class AsyncConnectionExtensions
             transaction,
             queryTimeout,
             commandType);
-        return await QueryScalarAsyncImpl<AnyDbDecode<T>, T?>(command, cancellationToken);
-    }
-
-    public static async Task<T?> QueryScalarAsync<T>(
-        this DbConnection connection,
-        string query,
-        object? parameters = null,
-        DbTransaction? transaction = null,
-        int? queryTimeout = null,
-        CommandType? commandType = null,
-        CancellationToken cancellationToken = default)
-        where
-        T : class
-    {
-        SqlSharpCommand<DbConnection, DbTransaction> command = new(
-            connection,
-            query,
-            parameters,
-            transaction,
-            queryTimeout,
-            commandType);
-        return await QueryScalarAsyncImpl<AnyRefDbDecode<T>, T?>(command, cancellationToken);
+        return await QueryScalarAsyncImpl<AnyDbDecode<T>, T>(command, cancellationToken);
     }
 
     public static async Task<T> QuerySingleAsync<T>(
@@ -271,13 +248,17 @@ public static class AsyncConnectionExtensions
         return await enumerator.MoveNextAsync() ? enumerator.Current : default;
     }
 
-    private static async Task<TResult?> QueryScalarAsyncImpl<TDecoder, TResult>(
+    private static async Task<TResult> QueryScalarAsyncImpl<TDecoder, TResult>(
         SqlSharpCommand<DbConnection, DbTransaction> command,
         CancellationToken cancellationToken) where TDecoder : IDbDecode<TResult>
     {
         var row = await QueryFirstOrNullAsyncImpl<ScalarResultRow<TDecoder, TResult>>(
             command,
             cancellationToken);
-        return row is null ? default : row.Inner;
+        if (row is null)
+        {
+            return default!;
+        }
+        return row.Inner ?? default!;
     }
 }

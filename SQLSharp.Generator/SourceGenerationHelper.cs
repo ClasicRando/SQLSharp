@@ -113,11 +113,6 @@ public static class SourceGenerationHelper
 
 
             builder.Append("row.GetField");
-            if (parameter.TypeData.IsRefType)
-            {
-                builder.Append("AsClass");
-            }
-
             if (!parameter.TypeData.IsNullable)
             {
                 builder.Append("NotNull");
@@ -125,6 +120,10 @@ public static class SourceGenerationHelper
 
             builder.Append('<');
             builder.Append(typeName);
+            if (parameter.TypeData is { IsRefType: false, IsNullable: true })
+            {
+                builder.Append('?');
+            }
             builder.Append('>');
             builder.Append("(\"");
             var fieldName = rowParserToGenerate.Rename

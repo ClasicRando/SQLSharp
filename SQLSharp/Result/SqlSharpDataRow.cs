@@ -2,12 +2,12 @@ using SQLSharp.Exceptions;
 
 namespace SQLSharp.Result;
 
-public class SqlSharpDataRow : IDataRow
+internal class SqlSharpDataRow : IDataRow
 {
     private readonly List<string> _fieldNames;
-    private readonly object?[] _values;
+    private readonly object[] _values;
 
-    public SqlSharpDataRow(List<string> fieldNames, object?[] values)
+    public SqlSharpDataRow(List<string> fieldNames, object[] values)
     {
         _fieldNames = fieldNames ?? throw new ArgumentNullException(nameof(fieldNames));
         _values = values ?? throw new ArgumentNullException(nameof(values));
@@ -25,5 +25,5 @@ public class SqlSharpDataRow : IDataRow
         return index;
     }
 
-    public object? this[int index] => _values[index];
+    public object this[int index] => _values[index];
 }

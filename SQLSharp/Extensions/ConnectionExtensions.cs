@@ -8,7 +8,7 @@ namespace SQLSharp.Extensions;
 
 public static class ConnectionExtensions
 {
-    public static T? QueryScalarDecode<T>(
+    public static T QueryScalarDecode<T>(
         this IDbConnection connection,
         string query,
         object? parameters = null,
@@ -26,15 +26,13 @@ public static class ConnectionExtensions
         return QueryScalarImpl<T, T>(command);
     }
 
-    public static T? QueryScalarValue<T>(
+    public static T? QueryScalar<T>(
         this IDbConnection connection,
         string query,
         object? parameters = null,
         IDbTransaction? transaction = null,
         int? queryTimeout = null,
         CommandType? commandType = null)
-        where
-        T : struct
     {
         SqlSharpCommand<IDbConnection, IDbTransaction> command = new(
             connection,
@@ -44,26 +42,6 @@ public static class ConnectionExtensions
             queryTimeout,
             commandType);
         return QueryScalarImpl<AnyDbDecode<T>, T?>(command);
-    }
-
-    public static T? QueryScalar<T>(
-        this IDbConnection connection,
-        string query,
-        object? parameters = null,
-        IDbTransaction? transaction = null,
-        int? queryTimeout = null,
-        CommandType? commandType = null)
-        where
-        T : class
-    {
-        SqlSharpCommand<IDbConnection, IDbTransaction> command = new(
-            connection,
-            query,
-            parameters,
-            transaction,
-            queryTimeout,
-            commandType);
-        return QueryScalarImpl<AnyRefDbDecode<T>, T?>(command);
     }
 
     public static T QuerySingle<T>(
@@ -99,7 +77,7 @@ public static class ConnectionExtensions
             commandType);
         var rows = QueryImpl<T>(command);
         using var enumerator = rows.GetEnumerator();
-        var result = enumerator.MoveNext() ? enumerator.Current : default;
+        T? result = enumerator.MoveNext() ? enumerator.Current : default;
         if (enumerator.MoveNext())
         {
             throw new SqlSharpException("Expected exactly 1 row but found more than 1");
@@ -188,7 +166,7 @@ public static class ConnectionExtensions
             reader = command.ExecuteReader();
             if (!reader.Read()) yield break;
 
-            var schemaTable = reader.GetSchemaTable();
+            DataTable? schemaTable = reader.GetSchemaTable();
             var columnNameQuery = from DataRow column in schemaTable!.Rows
                 select column.Field<string>("ColumnName");
             List<string> fieldNames = columnNameQuery.ToList();
@@ -245,10 +223,14 @@ public static class ConnectionExtensions
         return enumerator.MoveNext() ? enumerator.Current : default;
     }
 
-    private static TResult? QueryScalarImpl<TDecoder, TResult>(
+    private static TResult QueryScalarImpl<TDecoder, TResult>(
         SqlSharpCommand<IDbConnection, IDbTransaction> command) where TDecoder : IDbDecode<TResult>
     {
         var row = QueryFirstOrNullImpl<ScalarResultRow<TDecoder, TResult>>(command);
-        return row is null ? default : row.Inner;
+        if (row is null)
+        {
+            return default!;
+        }
+        return row.Inner ?? default!;
     }
 }

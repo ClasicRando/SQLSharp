@@ -13,7 +13,7 @@ var builder = new NpgsqlConnectionStringBuilder
 };
 await using var connection = new NpgsqlConnection(builder.ToString());
 
-var value = connection.QueryScalarValue<int>("SELECT 1");
+var value = connection.QueryScalar<int>("SELECT 1");
 
 Console.WriteLine($"Value: {value}");
 
@@ -53,16 +53,16 @@ internal readonly record struct Row : IFromRow<Row>
     
     public byte Age { get; init; }
     
-    public DateTime DateOfBirth { get; init; }
+    public DateTime? DateOfBirth { get; init; }
 
     public static Row FromRow(IDataRow row)
     {
         return new Row
         {
             Id = row.GetFieldNotNull<Guid>("id"),
-            Name = row.GetFieldAsClassNotNull<string>("name"),
+            Name = row.GetFieldNotNull<string>("name"),
             Age = row.GetFieldNotNull<byte>("age"),
-            DateOfBirth = row.GetFieldNotNull<DateTime>("date_of_birth"),
+            DateOfBirth = row.GetField<DateTime?>("date_of_birth"),
         };
     }
 }
