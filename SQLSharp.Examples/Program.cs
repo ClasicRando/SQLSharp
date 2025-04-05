@@ -2,6 +2,7 @@
 using SQLSharp.Extensions;
 using SQLSharp.Generator.Result;
 using SQLSharp.Result;
+using SQLSharp.Types;
 
 var builder = new NpgsqlConnectionStringBuilder
 {
@@ -45,6 +46,18 @@ await foreach (GeneratedRow row in generatedRows)
     Console.WriteLine(row.ToString());
 }
 
+var generatedRows2 = connection.QueryAsync<GeneratedRow2>(
+    """
+    SELECT
+        gen_random_uuid() as "Id",
+        2940 as "UniqueId"
+    """);
+
+await foreach (GeneratedRow2 row in generatedRows2)
+{
+    Console.WriteLine(row.ToString());
+}
+
 internal readonly record struct Row : IFromRow<Row>
 {
     public Guid Id { get; init; }
@@ -82,5 +95,25 @@ internal readonly partial struct GeneratedRow(Guid id, [Column(Flatten = true)] 
     public override string ToString()
     {
         return $"GeneratedRow[id={id},innerRow={innerRow}]";
+    }
+}
+
+namespace Examples.Test
+{
+    internal readonly record struct IntValue(int inner) : IDbDecode<IntValue>
+    {
+        public static IntValue Decode(IDataRow row, int column)
+        {
+            return new IntValue(row.GetField<int>(column));
+        }
+    }
+}
+
+[FromRow(RenameAll = Rename.PascalCase)]
+internal readonly partial struct GeneratedRow2(Guid id, Examples.Test.IntValue uniqueId)
+{
+    public override string ToString()
+    {
+        return $"GeneratedRow[id={id},uniqueId={uniqueId}]";
     }
 }

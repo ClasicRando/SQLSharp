@@ -17,12 +17,14 @@ internal class SqlSharpDataRow : IDataRow
     {
         ArgumentNullException.ThrowIfNull(fieldName);
         var index = _fieldNames.IndexOf(fieldName);
-        if (index == -1)
+        if (index != -1)
         {
-            throw new SqlSharpException($"Could not find field '{fieldName}' in result");
+            return index;
         }
-
-        return index;
+        
+        var fieldNames = string.Join(",", _fieldNames.Select(n => $"\"{n}\""));
+        throw new SqlSharpException(
+            $"Could not find field '{fieldName}' in result. Fields names are, {fieldNames}");
     }
 
     public object this[int index] => _values[index];

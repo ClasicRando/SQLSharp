@@ -9,8 +9,9 @@ C# Library for ADO.net providing a middle ground between Dapper and Rust's sqlx 
    1. Only works for definitions that contains a constructor
       1. For structs, largest constructor is used
       2. For classes, smallest constructor is used
-   2. Allow for renaming single or all fields when parsing result set
-   3. Allow for flattening a result into nested objects (but not nested arrays)
+   2. Allows renaming single or all fields when parsing result set
+   3. Allows flattening a result into nested objects (but not nested arrays)
+   4. Allows handling of fields whose type is `IDbDecode`
 
 ### TODO
 * Add property initializer ability for definition without constructors

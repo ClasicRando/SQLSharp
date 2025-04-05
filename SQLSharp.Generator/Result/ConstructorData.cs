@@ -91,9 +91,10 @@ public record ParameterData
             : parameterSymbol.Type.Name;
         var typeData = new ParameterTypeData(
             typeName,
-            parameterSymbol.Type.ContainingNamespace.Name,
+            parameterSymbol.Type.ContainingNamespace.GetFullNamespaceName(),
             parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated);
+            parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated,
+            parameterSymbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
         return new ParameterData(
             parameterSymbol.Name,
             resultFieldName,
@@ -109,16 +110,19 @@ public record ParameterTypeData
     public string ContainingNamespace { get; }
     public bool IsRefType { get; }
     public bool IsNullable { get; }
+    public bool IsDecode { get; }
 
     public ParameterTypeData(
         string name,
         string containingNamespace,
         bool isRefType,
-        bool isNullable)
+        bool isNullable,
+        bool isDecode)
     {
         Name = name;
         ContainingNamespace = containingNamespace;
         IsRefType = isRefType;
         IsNullable = isNullable;
+        IsDecode = isDecode;
     }
 }
