@@ -134,4 +134,21 @@ public class FromRowGeneratorSnapshotTests
 
         return TestHelper.Verify(source);
     }
+    
+    [Fact]
+    public Task Should_GeneratesIFromRowImplementationRespectingColumnAttribute_when_StructTypeWithConstructorAndRenameAllSnakeCase()
+    {
+        const string source = """
+                              using SQLSharp.Generator.Result;
+
+                              [FromRow(RenameAll = Rename.SnakeCase)]
+                              internal readonly partial struct GeneratedRow(
+                                  Guid id,
+                                  string name,
+                                  byte age,
+                                  [Column(Name = "DateOfBirth")] DateTime? dateOfBirth);
+                              """;
+
+        return TestHelper.Verify(source);
+    }
 }

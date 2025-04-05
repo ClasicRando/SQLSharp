@@ -27,17 +27,20 @@ public record ParameterData
 {
     public string Name { get; }
     public string ResultFieldName { get; }
+    public bool HasRename { get; }
     public bool Flatten { get; }
     public ParameterTypeData TypeData { get; }
 
     private ParameterData(
         string name,
         string resultFieldName,
+        bool hasRename,
         bool flatten,
         ParameterTypeData typeData)
     {
         Name = name;
         ResultFieldName = resultFieldName;
+        HasRename = hasRename;
         Flatten = flatten;
         TypeData = typeData;
     }
@@ -50,6 +53,7 @@ public record ParameterData
             .GetAttributes()
             .FirstOrDefault(a => columnAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default));
         var resultFieldName = parameterSymbol.Name;
+        var hasRename = false;
         var flatten = false;
         if (attributeData is not null)
         {
@@ -65,6 +69,8 @@ public record ParameterData
                         {
                             continue;
                         }
+
+                        hasRename = true;
                         resultFieldName = attributeName!;
                         break;
                     }
@@ -88,7 +94,12 @@ public record ParameterData
             parameterSymbol.Type.ContainingNamespace.Name,
             parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
             parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated);
-        return new ParameterData(parameterSymbol.Name, resultFieldName, flatten, typeData);
+        return new ParameterData(
+            parameterSymbol.Name,
+            resultFieldName,
+            hasRename,
+            flatten,
+            typeData);
     }
 }
 

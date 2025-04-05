@@ -144,8 +144,9 @@ public static class SourceGenerationHelper
             }
             builder.Append('>');
             builder.Append("(\"");
-            var fieldName = rowParserToGenerate.Rename
-                .TransformRowFieldName(parameter.ResultFieldName);
+            var fieldName = parameter.HasRename
+                ? parameter.ResultFieldName
+                : rowParserToGenerate.Rename.TransformRowFieldName(parameter.ResultFieldName);
             builder.Append(fieldName);
             builder.Append("\")");
 
