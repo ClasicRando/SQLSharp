@@ -27,7 +27,7 @@ public class FromRowGeneratorSnapshotTests
                                   Guid id,
                                   string name,
                                   byte age,
-                                  [Column(Name = "date_of_birth")] DateTime? dateOfBirth);
+                                  [Column(Rename = "date_of_birth")] DateTime? dateOfBirth);
                               """;
 
         return TestHelper.Verify(source);
@@ -146,7 +146,7 @@ public class FromRowGeneratorSnapshotTests
                                   Guid id,
                                   string name,
                                   byte age,
-                                  [Column(Name = "DateOfBirth")] DateTime? dateOfBirth);
+                                  [Column(Rename = "DateOfBirth")] DateTime? dateOfBirth);
                               """;
 
         return TestHelper.Verify(source);

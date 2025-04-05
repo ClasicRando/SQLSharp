@@ -62,7 +62,7 @@ public record ParameterData
                 var value = kvp.Value.Value;
                 switch (kvp.Key)
                 {
-                    case "Name":
+                    case "Rename":
                     {
                         var attributeName = value?.ToString();
                         if (string.IsNullOrEmpty(attributeName))
