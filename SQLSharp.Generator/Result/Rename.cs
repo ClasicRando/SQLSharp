@@ -17,17 +17,13 @@ public static class RenameExtensions
 {
     private static readonly Regex IsNotAlphaNumeric = new("[^0-9a-zA-Z]", RegexOptions.Compiled);
     
-    public static Rename? ParseToRename(this string str)
+    public static Rename ParseToRename(this object value)
     {
-        return str switch
+        if (value is int i)
         {
-            "snake_case" => Rename.SnakeCase,
-            "camelCase" => Rename.CamelCase,
-            "PascalCase" => Rename.PascalCase,
-            "UPPERCASE" => Rename.UpperCase,
-            "lowercase" => Rename.LowerCase,
-            _ => null,
-        };
+            return (Rename)i;
+        }
+        return Rename.None;
     }
 
     public static string TransformRowFieldName(this Rename rename, string rowFieldName)
@@ -46,7 +42,7 @@ public static class RenameExtensions
             Rename.UpperCase => rowFieldName.ToUpperInvariant(),
             Rename.LowerCase => rowFieldName.ToLowerInvariant(),
             Rename.None => rowFieldName,
-            _ => throw new ArgumentOutOfRangeException(nameof(rename), rename, null),
+            _ => rowFieldName,
         };
     }
 

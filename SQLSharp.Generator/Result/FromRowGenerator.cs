@@ -18,6 +18,9 @@ public class FromRowGenerator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(static ctx =>
         {
             ctx.AddSource(
+                "Rename.g.cs",
+                SourceText.From(SourceGenerationHelper.RenameEnum, Encoding.UTF8));
+            ctx.AddSource(
                 "FromRowAttribute.g.cs",
                 SourceText.From(SourceGenerationHelper.FromRowAttribute, Encoding.UTF8));
             ctx.AddSource(
@@ -86,14 +89,14 @@ public class FromRowGenerator : IIncrementalGenerator
             return null;
         }
 
-        var rename = typeSymbol.GetAttributes()
+        Rename rename = typeSymbol.GetAttributes()
             .FirstOrDefault(a =>
                 fromRowAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default))
             ?.NamedArguments
             .Where(na => na.Key == "RenameAll")
-            .Select(na => na.Value.Value?.ToString())
+            .Select(na => na.Value.Value)
             .FirstOrDefault()
-            ?.ParseToRename();
+            ?.ParseToRename() ?? Rename.None;
         
         return new RowParserToGenerate(
             typeSymbol.Name,

@@ -67,7 +67,7 @@ internal readonly record struct Row : IFromRow<Row>
     }
 }
 
-[FromRow(RenameAll = "snake_case")]
+[FromRow(RenameAll = Rename.SnakeCase)]
 internal readonly partial struct InnerRow(string name, byte age, DateTime? dateOfBirth)
 {
     public override string ToString()
@@ -77,9 +77,7 @@ internal readonly partial struct InnerRow(string name, byte age, DateTime? dateO
 }
 
 [FromRow]
-internal readonly partial struct GeneratedRow(
-    Guid id,
-    [Column(Flatten = true)] InnerRow innerRow)
+internal readonly partial struct GeneratedRow(Guid id, [Column(Flatten = true)] InnerRow innerRow)
 {
     public override string ToString()
     {
