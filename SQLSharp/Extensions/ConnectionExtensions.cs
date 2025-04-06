@@ -215,6 +215,64 @@ public static class ConnectionExtensions
         }
     }
 
+    public static int Execute(
+        this IDbConnection connection,
+        string query,
+        object? parameters = null,
+        IDbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null)
+    {
+        SqlSharpCommand<IDbConnection, IDbTransaction> command = new(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType);
+        return Execute(command);
+    }
+
+    private static int Execute(SqlSharpCommand<IDbConnection, IDbTransaction> sqlSharpAsyncCommand)
+    {
+        var wasClosed = sqlSharpAsyncCommand.Connection.State == ConnectionState.Closed;
+        IDbCommand? command = null;
+
+        try
+        {
+            if (wasClosed)
+            {
+                sqlSharpAsyncCommand.Connection.Open();
+            }
+
+            command = sqlSharpAsyncCommand.Connection.CreateCommand();
+            command.CommandText = sqlSharpAsyncCommand.Query;
+            command.CommandType = sqlSharpAsyncCommand.CommandType;
+            command.Transaction = sqlSharpAsyncCommand.Transaction;
+            command.CommandTimeout = sqlSharpAsyncCommand.QueryTimeout;
+
+            if (sqlSharpAsyncCommand.Parameters is not null)
+            {
+                command.AddParameters(sqlSharpAsyncCommand.Parameters);
+            }
+
+            return command.ExecuteNonQuery();
+        }
+        finally
+        {
+            if (wasClosed)
+            {
+                sqlSharpAsyncCommand.Connection.Close();
+            }
+
+            if (command is not null)
+            {
+                command.Parameters.Clear();
+                command.Dispose();
+            }
+        }
+    }
+
     private static T? QueryFirstOrNullImpl<T>(
         SqlSharpCommand<IDbConnection, IDbTransaction> command) where T : IFromRow<T>
     {

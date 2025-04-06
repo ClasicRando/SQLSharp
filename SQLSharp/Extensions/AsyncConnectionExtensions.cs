@@ -239,6 +239,68 @@ public static class AsyncConnectionExtensions
         }
     }
 
+    public static Task<int> QueryAsync(
+        this DbConnection connection,
+        string query,
+        object? parameters = null,
+        DbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default)
+    {
+        SqlSharpCommand<DbConnection, DbTransaction> command = new(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType);
+        return ExecuteAsync(command, cancellationToken);
+    }
+
+    private static async Task<int> ExecuteAsync(
+        SqlSharpCommand<DbConnection, DbTransaction> sqlSharpAsyncCommand,
+        CancellationToken cancellationToken = default)
+    {
+        var wasClosed = sqlSharpAsyncCommand.Connection.State == ConnectionState.Closed;
+        DbCommand? command = null;
+
+        try
+        {
+            if (wasClosed)
+            {
+                await sqlSharpAsyncCommand.Connection.OpenAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            command = sqlSharpAsyncCommand.Connection.CreateCommand();
+            command.CommandText = sqlSharpAsyncCommand.Query;
+            command.CommandType = sqlSharpAsyncCommand.CommandType;
+            command.Transaction = sqlSharpAsyncCommand.Transaction;
+            command.CommandTimeout = sqlSharpAsyncCommand.QueryTimeout;
+
+            if (sqlSharpAsyncCommand.Parameters is not null)
+            {
+                command.AddParameters(sqlSharpAsyncCommand.Parameters);
+            }
+
+            return await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            if (wasClosed)
+            {
+                await sqlSharpAsyncCommand.Connection.CloseAsync().ConfigureAwait(false);
+            }
+
+            if (command is not null)
+            {
+                command.Parameters.Clear();
+                await command.DisposeAsync().ConfigureAwait(false);
+            }
+        }
+    }
+
     private static async Task<T?> QueryFirstOrNullAsyncImpl<T>(
         SqlSharpCommand<DbConnection, DbTransaction> command,
         CancellationToken cancellationToken) where T : IFromRow<T>
