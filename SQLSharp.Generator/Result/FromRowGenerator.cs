@@ -75,7 +75,9 @@ public class FromRowGenerator : IIncrementalGenerator
         }
     }
     
-    private static RowParserToGenerate? GetRowParserToGenerate(Compilation compilation, INamedTypeSymbol typeSymbol)
+    private static RowParserToGenerate? GetRowParserToGenerate(
+        Compilation compilation,
+        INamedTypeSymbol typeSymbol)
     {
         INamedTypeSymbol? columnAttribute = compilation.GetTypeByMetadataName(ColumnAttributeName);
         if (columnAttribute is null)
@@ -107,8 +109,9 @@ public class FromRowGenerator : IIncrementalGenerator
             typeSymbol.IsValueType,
             rename,
             typeSymbol.Constructors
+                .Where(c => c.Parameters.Length > 0)
                 .Select(c => ConstructorData.FromMethodSymbol(c, columnAttribute))
                 .ToImmutableArray(),
-            typeSymbol.GetMembers());
+            InitializerData.FromTypeSymbol(typeSymbol, columnAttribute));
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
@@ -11,7 +10,7 @@ public record RowParserToGenerate
     public bool IsStruct { get; }
     public Rename Rename { get; }
     public ImmutableArray<ConstructorData> Constructors { get; }
-    public ImmutableArray<ISymbol> Members { get; }
+    public InitializerData InitializerData { get; }
 
     public RowParserToGenerate(
         string name,
@@ -20,7 +19,7 @@ public record RowParserToGenerate
         bool isStruct,
         Rename rename,
         ImmutableArray<ConstructorData> constructors,
-        ImmutableArray<ISymbol> members)
+        InitializerData initializerData)
     {
         Name = name;
         Namespace = typeNamespace;
@@ -28,6 +27,6 @@ public record RowParserToGenerate
         IsStruct = isStruct;
         Rename = rename;
         Constructors = constructors;
-        Members = members;
+        InitializerData = initializerData;
     }
 }

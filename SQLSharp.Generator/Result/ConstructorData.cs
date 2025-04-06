@@ -5,9 +5,9 @@ namespace SQLSharp.Generator.Result;
 
 public record ConstructorData
 {
-    public ImmutableArray<ParameterData> Parameters { get; }
+    public ImmutableArray<FieldData> Parameters { get; }
 
-    private ConstructorData(ImmutableArray<ParameterData> parameters)
+    private ConstructorData(ImmutableArray<FieldData> parameters)
     {
         Parameters = parameters;
     }
@@ -17,112 +17,8 @@ public record ConstructorData
         INamedTypeSymbol columnAttribute)
     {
         var parameters = methodSymbol.Parameters
-            .Select(p => ParameterData.FromParameterSymbol(p, columnAttribute))
+            .Select(p => FieldData.FromParameterSymbol(p, columnAttribute))
             .ToImmutableArray();
         return new ConstructorData(parameters);
-    }
-}
-
-public record ParameterData
-{
-    public string Name { get; }
-    public string ResultFieldName { get; }
-    public bool HasRename { get; }
-    public bool Flatten { get; }
-    public ParameterTypeData TypeData { get; }
-
-    private ParameterData(
-        string name,
-        string resultFieldName,
-        bool hasRename,
-        bool flatten,
-        ParameterTypeData typeData)
-    {
-        Name = name;
-        ResultFieldName = resultFieldName;
-        HasRename = hasRename;
-        Flatten = flatten;
-        TypeData = typeData;
-    }
-    
-    public static ParameterData FromParameterSymbol(
-        IParameterSymbol parameterSymbol,
-        INamedTypeSymbol columnAttribute)
-    {
-        AttributeData? attributeData = parameterSymbol
-            .GetAttributes()
-            .FirstOrDefault(a => columnAttribute.Equals(a.AttributeClass, SymbolEqualityComparer.Default));
-        var resultFieldName = parameterSymbol.Name;
-        var hasRename = false;
-        var flatten = false;
-        if (attributeData is not null)
-        {
-            foreach (var kvp in attributeData.NamedArguments)
-            {
-                var value = kvp.Value.Value;
-                switch (kvp.Key)
-                {
-                    case "Rename":
-                    {
-                        var attributeName = value?.ToString();
-                        if (string.IsNullOrEmpty(attributeName))
-                        {
-                            continue;
-                        }
-
-                        hasRename = true;
-                        resultFieldName = attributeName!;
-                        break;
-                    }
-                    case "Flatten":
-                    {
-                        if (value is bool b)
-                        {
-                            flatten = b;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        var isNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
-        var typeName = isNullable
-            ? ((INamedTypeSymbol)parameterSymbol.Type).TypeArguments.First().Name
-            : parameterSymbol.Type.Name;
-        var typeData = new ParameterTypeData(
-            typeName,
-            parameterSymbol.Type.ContainingNamespace.GetFullNamespaceName(),
-            parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated,
-            parameterSymbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
-        return new ParameterData(
-            parameterSymbol.Name,
-            resultFieldName,
-            hasRename,
-            flatten,
-            typeData);
-    }
-}
-
-public record ParameterTypeData
-{
-    public string Name { get; }
-    public string ContainingNamespace { get; }
-    public bool IsRefType { get; }
-    public bool IsNullable { get; }
-    public bool IsDecode { get; }
-
-    public ParameterTypeData(
-        string name,
-        string containingNamespace,
-        bool isRefType,
-        bool isNullable,
-        bool isDecode)
-    {
-        Name = name;
-        ContainingNamespace = containingNamespace;
-        IsRefType = isRefType;
-        IsNullable = isNullable;
-        IsDecode = isDecode;
     }
 }

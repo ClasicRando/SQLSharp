@@ -58,6 +58,20 @@ await foreach (GeneratedRow2 row in generatedRows2)
     Console.WriteLine(row.ToString());
 }
 
+var initRows = connection.QueryAsync<InitRow>(
+    """
+    SELECT
+        gen_random_uuid() as id,
+        'Init Name' as name,
+        20 as "age",
+        null as date_of_birth
+    """);
+
+await foreach (InitRow row in initRows)
+{
+    Console.WriteLine(row.ToString());
+}
+
 internal readonly record struct Row : IFromRow<Row>
 {
     public Guid Id { get; init; }
@@ -115,5 +129,19 @@ internal readonly partial struct GeneratedRow2(Guid id, Examples.Test.IntValue u
     public override string ToString()
     {
         return $"GeneratedRow[id={id},uniqueId={uniqueId}]";
+    }
+}
+
+[FromRow(RenameAll = Rename.SnakeCase)]
+internal partial class InitRow
+{
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    public required byte Age { get; init; }
+    public required DateTime? DateOfBirth { get; init; }
+    
+    public override string ToString()
+    {
+        return $"InitRow[id={Id},Name={Name},Age={Age},DateOfBirth={DateOfBirth}]";
     }
 }

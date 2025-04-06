@@ -74,13 +74,16 @@ public static class DbCommandExtensions
                 encode.Encode(ref parameter);
                 break;
             default:
-                parameter.DbType = GetDbType(parameter);
+                if (GetDbType(parameter) is {} dbType)
+                {
+                    parameter.DbType = dbType;
+                }
                 parameter.Value = value;
                 break;
         }
     }
 
-    private static DbType GetDbType(object parameter)
+    private static DbType? GetDbType(object parameter)
     {
         return parameter switch
         {
@@ -101,8 +104,7 @@ public static class DbCommandExtensions
             DateTime => DbType.DateTime,
             DateTimeOffset => DbType.DateTimeOffset,
             Guid => DbType.Guid,
-            _ => throw new SqlSharpException(
-                $"Could not find DbType for type {parameter.GetType()}"),
+            _ => null,
         };
     }
 }
