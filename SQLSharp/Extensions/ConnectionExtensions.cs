@@ -138,6 +138,24 @@ public static class ConnectionExtensions
         return QueryImpl<T>(command);
     }
 
+    public static List<T> QueryAll<T>(
+        this IDbConnection connection,
+        string query,
+        object? parameters = null,
+        IDbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null) where T : IFromRow<T>
+    {
+        return Query<T>(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType)
+            .ToList();
+    }
+
     private static IEnumerable<T> QueryImpl<T>(
         SqlSharpCommand<IDbConnection, IDbTransaction> sqlSharpCommand) where T : IFromRow<T>
     {

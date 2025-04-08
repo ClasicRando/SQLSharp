@@ -88,7 +88,7 @@ public static class AsyncConnectionExtensions
             commandType,
             cancellationToken
         );
-        var enumerator = rows.GetAsyncEnumerator(cancellationToken);
+        await using var enumerator = rows.GetAsyncEnumerator(cancellationToken);
         T? result = await enumerator.MoveNextAsync() ? enumerator.Current : default;
         if (await enumerator.MoveNextAsync())
         {
@@ -153,6 +153,28 @@ public static class AsyncConnectionExtensions
             queryTimeout,
             commandType);
         return QueryAsyncImpl<T>(command, cancellationToken);
+    }
+
+    public static async Task<List<T>> QueryAllAsync<T>(
+        this DbConnection connection,
+        string query,
+        object? parameters = null,
+        DbTransaction? transaction = null,
+        int? queryTimeout = null,
+        CommandType? commandType = null,
+        CancellationToken cancellationToken = default) where T : IFromRow<T>
+    {
+        var result = await QueryAsync<T>(
+            connection,
+            query,
+            parameters,
+            transaction,
+            queryTimeout,
+            commandType,
+            cancellationToken)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return result;
     }
 
     private static async IAsyncEnumerable<T> QueryAsyncImpl<T>(
@@ -239,7 +261,7 @@ public static class AsyncConnectionExtensions
         }
     }
 
-    public static Task<int> QueryAsync(
+    public static Task<int> ExecuteAsync(
         this DbConnection connection,
         string query,
         object? parameters = null,
@@ -306,8 +328,10 @@ public static class AsyncConnectionExtensions
         CancellationToken cancellationToken) where T : IFromRow<T>
     {
         var rows = QueryAsyncImpl<T>(command, cancellationToken);
-        var enumerator = rows.GetAsyncEnumerator(cancellationToken);
-        return await enumerator.MoveNextAsync() ? enumerator.Current : default;
+        await using var enumerator = rows.GetAsyncEnumerator(cancellationToken);
+        return await enumerator.MoveNextAsync().ConfigureAwait(false)
+            ? enumerator.Current
+            : default;
     }
 
     private static async Task<TResult> QueryScalarAsyncImpl<TDecoder, TResult>(
