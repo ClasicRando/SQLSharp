@@ -41,7 +41,7 @@ public class SqlSharpParameters
             parameterDirection: parameterDirection,
             dbType: dbType,
             size: size,
-            precision: precision, 
+            precision: precision,
             scale: scale);
     }
 
@@ -68,7 +68,6 @@ public class SqlSharpParameters
 
     internal void AddToCommand(IDbCommand command)
     {
-        ArgumentNullException.ThrowIfNull(command);
         foreach (var kvp in _parameters)
         {
             IDbDataParameter parameter = command.CreateParameter();
@@ -92,13 +91,14 @@ public class SqlSharpParameters
                 parameter.Scale = scale;
             }
             kvp.Value.DbParameter = parameter;
+            command.Parameters.Add(parameter);
         }
     }
 
     private static string CleanParameterName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrWhiteSpace(name))
         {
             return name;
         }

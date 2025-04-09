@@ -6,6 +6,7 @@ using SQLSharp.Types;
 
 namespace SQLSharp.Tests.Extensions;
 
+[TestSubject(typeof(AsyncConnectionExtensions))]
 [Collection("PostgresDb")]
 public class AsyncConnectionExtensionsTest
 {

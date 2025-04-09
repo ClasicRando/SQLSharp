@@ -22,13 +22,27 @@ public class PostgresDbFixture : IAsyncLifetime
         Connection = new NpgsqlConnection(builder.ToString());
     }
     
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        return Connection.OpenAsync();
+        await Connection.OpenAsync();
+        await using DbCommand command = Connection.CreateCommand();
+        command.CommandText = """
+                              CREATE OR REPLACE PROCEDURE public.mock_procedure(out p_int int)
+                              LANGUAGE 'plpgsql'
+                              AS $$
+                              BEGIN
+                                  $1 := 10;
+                              END;
+                              $$;
+                              """;
+        await command.ExecuteNonQueryAsync();
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return Connection.CloseAsync();
+        await using DbCommand command = Connection.CreateCommand();
+        command.CommandText = "DROP PROCEDURE IF EXISTS public.mock_procedure(out int);";
+        await command.ExecuteNonQueryAsync();
+        await Connection.CloseAsync();
     }
 }

@@ -1,4 +1,6 @@
+using System.Data;
 using JetBrains.Annotations;
+using SQLSharp.Command;
 using SQLSharp.Exceptions;
 using SQLSharp.Extensions;
 using SQLSharp.Result;
@@ -6,6 +8,7 @@ using SQLSharp.Types;
 
 namespace SQLSharp.Tests.Extensions;
 
+[TestSubject(typeof(ConnectionExtensions))]
 [Collection("PostgresDb")]
 public class ConnectionExtensionsTest
 {
@@ -103,6 +106,42 @@ public class ConnectionExtensionsTest
             });
             
             Assert.Equal("Expected exactly 1 row but found none", e.Message);
+        }
+        
+        [Fact(DisplayName = "QuerySingle should extract first row when single row with anonymous object parameters")]
+        public void Test4()
+        {
+            var actual = _fixture.Connection.QuerySingle<Row>(
+                query: "SELECT @Id AS \"id\", @Name \"name\"",
+                parameters: new { ExpectedRow.Id, ExpectedRow.Name });
+        
+            Assert.Equal(ExpectedRow, actual);
+        }
+        
+        [Fact(DisplayName = "QuerySingle should extract first row when single row with key-value parameters")]
+        public void Test5()
+        {
+            List<KeyValuePair<string, object?>> parameters = [
+                new("Id", ExpectedRow.Id),
+                new("Name", ExpectedRow.Name)];
+            var actual = _fixture.Connection.QuerySingle<Row>(
+                query: "SELECT @Id AS \"id\", @Name \"name\"",
+                parameters: parameters);
+        
+            Assert.Equal(ExpectedRow, actual);
+        }
+        
+        [Fact(DisplayName = "QuerySingle should extract first row when single row with input only SqlSharpParameters")]
+        public void Test6()
+        {
+            SqlSharpParameters parameters = new();
+            parameters.Add("@Id", ExpectedRow.Id, dbType: DbType.Guid);
+            parameters.Add(":Name", ExpectedRow.Name, dbType: DbType.String);
+            var actual = _fixture.Connection.QuerySingle<Row>(
+                query: "SELECT @Id AS \"id\", @Name \"name\"",
+                parameters: parameters);
+        
+            Assert.Equal(ExpectedRow, actual);
         }
     }
 
@@ -349,6 +388,31 @@ public class ConnectionExtensionsTest
                 WHERE t.name IS NOT NULL
                 """);
             Assert.Empty(actual);
+        }
+    }
+
+    [Collection("PostgresDb")]
+    public class Execute
+    {
+        private readonly PostgresDbFixture _fixture;
+
+        public Execute(PostgresDbFixture fixture)
+        {
+            _fixture = fixture;
+        }
+        
+        [Fact(DisplayName = "Execute should execute when stored procedure with output SqlSharpParameters")]
+        public void Test1()
+        {
+            SqlSharpParameters parameters = new();
+            parameters.Add("@p_int", null, parameterDirection: ParameterDirection.Output);
+            _fixture.Connection.Execute(
+                query: "public.mock_procedure",
+                commandType: CommandType.StoredProcedure,
+                parameters: parameters);
+            var actual = parameters.Get<int>("@p_int");
+        
+            Assert.Equal(10, actual);
         }
     }
 }
