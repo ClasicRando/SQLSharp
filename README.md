@@ -32,7 +32,8 @@ fields by using the `[Column]` attribute. The 2 options are:
 
 ### TODO
 * Postgresql composite type support
-* Support for mapping enum types
 * SQLServer table value type support
 * SQLServer UDF type support
+* Batch statements?
 * Bulk copy helpers?
+* Generated repository classes?

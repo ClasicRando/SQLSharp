@@ -10,6 +10,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{32ED9E1E-12A1-4F6E-BE55-F015364AD984}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSharp.Tests", "SQLSharp.Tests\SQLSharp.Tests.csproj", "{B56364D7-1653-4B96-8F51-A7408F269C10}"
