@@ -13,7 +13,7 @@ public class PostgresDbFixture : IAsyncLifetime
     {
         var builder = new NpgsqlConnectionStringBuilder
         {
-            Host = "127.0.0.1",
+            Host = "localhost",
             Port = int.Parse(Environment.GetEnvironmentVariable("POSTGRES_PORT")!),
             Username = Environment.GetEnvironmentVariable("POSTGRES_USERNAME"),
             Password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD"),
