@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using SQLSharp.Generator.Common;
 
 namespace SQLSharp.Generator.Result;
 
@@ -8,14 +9,14 @@ public record FieldData
     public string ResultFieldName { get; }
     public bool HasRename { get; }
     public bool Flatten { get; }
-    public FieldTypeData TypeData { get; }
+    public TypeData TypeData { get; }
 
     private FieldData(
         string name,
         string resultFieldName,
         bool hasRename,
         bool flatten,
-        FieldTypeData typeData)
+        TypeData typeData)
     {
         Name = name;
         ResultFieldName = resultFieldName;
@@ -65,21 +66,12 @@ public record FieldData
             }
         }
         var isNullable = symbol.NullableAnnotation == NullableAnnotation.Annotated;
-        var typeName = isNullable
-            ? ((INamedTypeSymbol)symbol.Type).TypeArguments.First().Name
-            : symbol.Type.Name;
-        var typeData = new FieldTypeData(
-            typeName,
-            symbol.Type.ContainingNamespace.GetFullNamespaceName(),
-            symbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            symbol.NullableAnnotation == NullableAnnotation.Annotated,
-            symbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
         return new FieldData(
             symbol.Name,
             resultFieldName,
             hasRename,
             flatten,
-            typeData);
+            TypeData.FromTypeSymbol(symbol.Type, isNullable));
     }
     
     public static FieldData FromParameterSymbol(
@@ -123,43 +115,11 @@ public record FieldData
             }
         }
         var isNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
-        var typeName = isNullable
-            ? ((INamedTypeSymbol)parameterSymbol.Type).TypeArguments.First().Name
-            : parameterSymbol.Type.Name;
-        var typeData = new FieldTypeData(
-            typeName,
-            parameterSymbol.Type.ContainingNamespace.GetFullNamespaceName(),
-            parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated,
-            parameterSymbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
         return new FieldData(
             parameterSymbol.Name,
             resultFieldName,
             hasRename,
             flatten,
-            typeData);
-    }
-}
-
-public record FieldTypeData
-{
-    public string Name { get; }
-    public string ContainingNamespace { get; }
-    public bool IsRefType { get; }
-    public bool IsNullable { get; }
-    public bool IsDecode { get; }
-
-    public FieldTypeData(
-        string name,
-        string containingNamespace,
-        bool isRefType,
-        bool isNullable,
-        bool isDecode)
-    {
-        Name = name;
-        ContainingNamespace = containingNamespace;
-        IsRefType = isRefType;
-        IsNullable = isNullable;
-        IsDecode = isDecode;
+            TypeData.FromTypeSymbol(parameterSymbol.Type, isNullable));
     }
 }

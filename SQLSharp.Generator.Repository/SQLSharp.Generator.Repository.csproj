@@ -8,6 +8,7 @@
         <ImplicitUsings>true</ImplicitUsings>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <RootNamespace>SQLSharp.Generator.Repository</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,11 +21,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SQLSharp.Generator.Common\SQLSharp.Generator.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true"
               PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SQLSharp.Generator.Common\SQLSharp.Generator.Common.csproj" />
+    </ItemGroup>
+
 </Project>

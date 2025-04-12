@@ -31,9 +31,6 @@ fields by using the `[Column]` attribute. The 2 options are:
    for parsing using a `IFromRow` implementation
 
 ### TODO
-* Postgresql composite type support
-* SQLServer table value type support
-* SQLServer UDF type support
 * Batch statements?
 * Bulk copy helpers?
 * Generated repository classes?
