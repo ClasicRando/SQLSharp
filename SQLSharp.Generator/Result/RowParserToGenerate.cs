@@ -2,31 +2,20 @@ using System.Collections.Immutable;
 
 namespace SQLSharp.Generator.Result;
 
-public record RowParserToGenerate
+public record RowParserToGenerate(
+    string Name,
+    string Namespace,
+    bool IsPartial,
+    bool IsStruct,
+    Rename Rename,
+    ImmutableArray<ConstructorData> Constructors,
+    InitializerData InitializerData)
 {
-    public string Name { get; }
-    public string Namespace { get; }
-    public bool IsPartial { get; }
-    public bool IsStruct { get; }
-    public Rename Rename { get; }
-    public ImmutableArray<ConstructorData> Constructors { get; }
-    public InitializerData InitializerData { get; }
-
-    public RowParserToGenerate(
-        string name,
-        string typeNamespace,
-        bool isPartial,
-        bool isStruct,
-        Rename rename,
-        ImmutableArray<ConstructorData> constructors,
-        InitializerData initializerData)
-    {
-        Name = name;
-        Namespace = typeNamespace;
-        IsPartial = isPartial;
-        IsStruct = isStruct;
-        Rename = rename;
-        Constructors = constructors;
-        InitializerData = initializerData;
-    }
+    public string Name { get; } = Name;
+    public string Namespace { get; } = Namespace;
+    public bool IsPartial { get; } = IsPartial;
+    public bool IsStruct { get; } = IsStruct;
+    public Rename Rename { get; } = Rename;
+    public ImmutableArray<ConstructorData> Constructors { get; } = Constructors;
+    public InitializerData InitializerData { get; } = InitializerData;
 }

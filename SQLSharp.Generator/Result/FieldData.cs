@@ -2,27 +2,18 @@ using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
-public record FieldData
+public record FieldData(
+    string Name,
+    string ResultFieldName,
+    bool HasRename,
+    bool Flatten,
+    FieldTypeData TypeData)
 {
-    public string Name { get; }
-    public string ResultFieldName { get; }
-    public bool HasRename { get; }
-    public bool Flatten { get; }
-    public FieldTypeData TypeData { get; }
-
-    private FieldData(
-        string name,
-        string resultFieldName,
-        bool hasRename,
-        bool flatten,
-        FieldTypeData typeData)
-    {
-        Name = name;
-        ResultFieldName = resultFieldName;
-        HasRename = hasRename;
-        Flatten = flatten;
-        TypeData = typeData;
-    }
+    public string Name { get; } = Name;
+    public string ResultFieldName { get; } = ResultFieldName;
+    public bool HasRename { get; } = HasRename;
+    public bool Flatten { get; } = Flatten;
+    public FieldTypeData TypeData { get; } = TypeData;
     
     public static FieldData FromPropertySymbol(
         IPropertySymbol symbol,
@@ -141,25 +132,16 @@ public record FieldData
     }
 }
 
-public record FieldTypeData
+public record FieldTypeData(
+    string Name,
+    string ContainingNamespace,
+    bool IsRefType,
+    bool IsNullable,
+    bool IsDecode)
 {
-    public string Name { get; }
-    public string ContainingNamespace { get; }
-    public bool IsRefType { get; }
-    public bool IsNullable { get; }
-    public bool IsDecode { get; }
-
-    public FieldTypeData(
-        string name,
-        string containingNamespace,
-        bool isRefType,
-        bool isNullable,
-        bool isDecode)
-    {
-        Name = name;
-        ContainingNamespace = containingNamespace;
-        IsRefType = isRefType;
-        IsNullable = isNullable;
-        IsDecode = isDecode;
-    }
+    public string Name { get; } = Name;
+    public string ContainingNamespace { get; } = ContainingNamespace;
+    public bool IsRefType { get; } = IsRefType;
+    public bool IsNullable { get; } = IsNullable;
+    public bool IsDecode { get; } = IsDecode;
 }

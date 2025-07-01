@@ -3,14 +3,9 @@ using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
-public class InitializerData
+public class InitializerData(ImmutableArray<FieldData> properties)
 {
-    public ImmutableArray<FieldData> Properties { get; }
-
-    private InitializerData(ImmutableArray<FieldData> properties)
-    {
-        Properties = properties;
-    }
+    public ImmutableArray<FieldData> Properties { get; } = properties;
 
     public static InitializerData FromTypeSymbol(
         ITypeSymbol typeSymbol,
