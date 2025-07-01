@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: SQLSHARP002,
+      Title: Annotated type is not a valid wrapper type,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (0,0)-(0,0),
+      MessageFormat: '{0}' must have exactly 1 field or property to be a wrapper type,
+      Message: 'IntWrapper' must have exactly 1 field or property to be a wrapper type,
+      Category: SQLSharp Generation
+    }
+  ]
+}

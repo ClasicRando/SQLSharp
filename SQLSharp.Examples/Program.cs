@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using SQLSharp.Extensions;
 using SQLSharp.Generator.Result;
+using SQLSharp.Generator.Types;
 using SQLSharp.Result;
 using SQLSharp.Types;
 
@@ -74,11 +75,11 @@ await foreach (InitRow row in initRows)
 
 internal readonly record struct Row : IFromRow<Row>
 {
-    public Guid Id { get; init; }
+    public UserId Id { get; init; }
     
     public string Name { get; init; }
     
-    public byte Age { get; init; }
+    public Age Age { get; init; }
     
     public DateTime? DateOfBirth { get; init; }
 
@@ -86,9 +87,9 @@ internal readonly record struct Row : IFromRow<Row>
     {
         return new Row
         {
-            Id = row.GetFieldNotNull<Guid>("id"),
+            Id = UserId.Decode(row, row.IndexOf("id")),
             Name = row.GetFieldNotNull<string>("name"),
-            Age = row.GetFieldNotNull<byte>("age"),
+            Age = Age.Decode(row, row.IndexOf("age")),
             DateOfBirth = row.GetField<DateTime?>("date_of_birth"),
         };
     }
@@ -143,5 +144,27 @@ internal partial class InitRow
     public override string ToString()
     {
         return $"InitRow[id={Id},Name={Name},Age={Age},DateOfBirth={DateOfBirth}]";
+    }
+}
+
+[WrapperType]
+internal partial struct UserId(Guid inner)
+{
+    private readonly Guid _inner = inner;
+
+    public override string ToString()
+    {
+        return $"UserId({_inner})";
+    }
+}
+
+[WrapperType]
+internal partial class Age(byte inner)
+{
+    public byte Inner { get; } = inner;
+
+    public override string ToString()
+    {
+        return $"Age({Inner})";
     }
 }

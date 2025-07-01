@@ -13,7 +13,7 @@ public class FromRowGeneratorSnapshotTests
                               internal readonly partial struct GeneratedRow(Guid id, string name, byte age, DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -30,7 +30,7 @@ public class FromRowGeneratorSnapshotTests
                                   [Column(Rename = "date_of_birth")] DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -47,7 +47,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -64,7 +64,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? DateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -81,7 +81,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -98,7 +98,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -115,7 +115,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -132,7 +132,7 @@ public class FromRowGeneratorSnapshotTests
                                   DateTime? daTeOFBiRth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -149,7 +149,7 @@ public class FromRowGeneratorSnapshotTests
                                   [Column(Rename = "DateOfBirth")] DateTime? dateOfBirth);
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -170,7 +170,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     
@@ -195,7 +195,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -215,7 +215,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -235,7 +235,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -255,7 +255,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -275,7 +275,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -295,7 +295,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -315,7 +315,7 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
     
     [Fact]
@@ -336,6 +336,6 @@ public class FromRowGeneratorSnapshotTests
                               }
                               """;
 
-        return TestHelper.Verify(source);
+        return TestHelper.VerifyFromRowGenerator(source);
     }
 }
