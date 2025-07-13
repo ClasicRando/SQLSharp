@@ -173,11 +173,6 @@ public class FromRowGeneratorSnapshotTests
         return TestHelper.VerifyFromRowGenerator(source);
     }
     
-    
-    
-    
-    
-    
     [Fact]
     public Task Should_GeneratesIFromRowImplementationCorrectly_when_ClassTypeWithPropertyInitializersAndColumnAttribute()
     {

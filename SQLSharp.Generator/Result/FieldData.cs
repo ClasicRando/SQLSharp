@@ -2,20 +2,20 @@ using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
-public record FieldData(
+internal record FieldData(
     string Name,
     string ResultFieldName,
     bool HasRename,
     bool Flatten,
     FieldTypeData TypeData)
 {
-    public string Name { get; } = Name;
-    public string ResultFieldName { get; } = ResultFieldName;
-    public bool HasRename { get; } = HasRename;
-    public bool Flatten { get; } = Flatten;
-    public FieldTypeData TypeData { get; } = TypeData;
+    internal string Name { get; } = Name;
+    internal string ResultFieldName { get; } = ResultFieldName;
+    internal bool HasRename { get; } = HasRename;
+    internal bool Flatten { get; } = Flatten;
+    internal FieldTypeData TypeData { get; } = TypeData;
     
-    public static FieldData FromPropertySymbol(
+    internal static FieldData FromPropertySymbol(
         IPropertySymbol symbol,
         INamedTypeSymbol columnAttribute)
     {
@@ -73,7 +73,7 @@ public record FieldData(
             typeData);
     }
     
-    public static FieldData FromParameterSymbol(
+    internal static FieldData FromParameterSymbol(
         IParameterSymbol parameterSymbol,
         INamedTypeSymbol columnAttribute)
     {
@@ -132,16 +132,16 @@ public record FieldData(
     }
 }
 
-public record FieldTypeData(
+internal record FieldTypeData(
     string Name,
     string ContainingNamespace,
     bool IsRefType,
     bool IsNullable,
     bool IsDecode)
 {
-    public string Name { get; } = Name;
-    public string ContainingNamespace { get; } = ContainingNamespace;
-    public bool IsRefType { get; } = IsRefType;
-    public bool IsNullable { get; } = IsNullable;
-    public bool IsDecode { get; } = IsDecode;
+    internal string Name { get; } = Name;
+    internal string ContainingNamespace { get; } = ContainingNamespace;
+    internal bool IsRefType { get; } = IsRefType;
+    internal bool IsNullable { get; } = IsNullable;
+    internal bool IsDecode { get; } = IsDecode;
 }

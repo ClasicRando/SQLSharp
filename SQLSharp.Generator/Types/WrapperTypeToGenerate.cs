@@ -1,6 +1,6 @@
 namespace SQLSharp.Generator.Types;
 
-public record WrapperTypeToGenerate(
+internal record WrapperTypeToGenerate(
     string Name,
     string Namespace,
     bool IsPartial,
@@ -8,16 +8,18 @@ public record WrapperTypeToGenerate(
     bool IsStruct,
     InnerValueData? InnerValue)
 {
-    public string Name { get; } = Name;
-    public string Namespace { get; } = Namespace;
-    public bool IsPartial { get; } = IsPartial;
-    public bool HasNonDefaultConstructor { get; } = HasNonDefaultConstructor;
-    public bool IsStruct { get; } = IsStruct;
-    public InnerValueData? InnerValue { get; } = InnerValue;
+    internal string Name { get; } = Name;
+    internal string Namespace { get; } = Namespace;
+    internal bool IsPartial { get; } = IsPartial;
+    internal bool HasNonDefaultConstructor { get; } = HasNonDefaultConstructor;
+    internal bool IsStruct { get; } = IsStruct;
+    internal InnerValueData? InnerValue { get; } = InnerValue;
 }
 
-public record InnerValueData(string Name, string TypeName)
+internal record InnerValueData(string Name, string TypeName, bool IsRefType, bool IsNullable)
 {
-    public string Name { get; } = Name;
-    public string TypeName { get; } = TypeName;
+    internal string Name { get; } = Name;
+    internal string TypeName { get; } = TypeName;
+    internal bool IsRefType { get; } = IsRefType;
+    internal bool IsNullable { get; } = IsNullable;
 }

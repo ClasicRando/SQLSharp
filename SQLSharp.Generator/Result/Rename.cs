@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 
 namespace SQLSharp.Generator.Result;
 
-public enum Rename
+internal enum Rename
 {
     SnakeCase,
     CamelCase,
@@ -13,11 +13,11 @@ public enum Rename
     None,
 }
 
-public static class RenameExtensions
+internal static class RenameExtensions
 {
     private static readonly Regex IsNotAlphaNumeric = new("[^0-9a-zA-Z]", RegexOptions.Compiled);
     
-    public static Rename ParseToRename(this object value)
+    internal static Rename ParseToRename(this object value)
     {
         if (value is int i)
         {
@@ -26,7 +26,7 @@ public static class RenameExtensions
         return Rename.None;
     }
 
-    public static string TransformRowFieldName(this Rename rename, string rowFieldName)
+    internal static string TransformRowFieldName(this Rename rename, string rowFieldName)
     {
         return rename switch
         {

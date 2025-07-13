@@ -3,11 +3,11 @@ using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
-public class InitializerData(ImmutableArray<FieldData> properties)
+internal class InitializerData(ImmutableArray<FieldData> properties)
 {
-    public ImmutableArray<FieldData> Properties { get; } = properties;
+    internal ImmutableArray<FieldData> Properties { get; } = properties;
 
-    public static InitializerData FromTypeSymbol(
+    internal static InitializerData FromTypeSymbol(
         ITypeSymbol typeSymbol,
         INamedTypeSymbol columnAttribute)
     {

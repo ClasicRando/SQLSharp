@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace SQLSharp.Generator.Result;
 
 [Generator]
-public class FromRowGenerator : IIncrementalGenerator
+internal class FromRowGenerator : IIncrementalGenerator
 {
     private const string ColumnAttributeName = "SQLSharp.Generator.Result.ColumnAttribute";
     private const string FromRowAttributeName = "SQLSharp.Generator.Result.FromRowAttribute";

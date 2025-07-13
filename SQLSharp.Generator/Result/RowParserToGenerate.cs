@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace SQLSharp.Generator.Result;
 
-public record RowParserToGenerate(
+internal record RowParserToGenerate(
     string Name,
     string Namespace,
     bool IsPartial,
@@ -11,11 +11,11 @@ public record RowParserToGenerate(
     ImmutableArray<ConstructorData> Constructors,
     InitializerData InitializerData)
 {
-    public string Name { get; } = Name;
-    public string Namespace { get; } = Namespace;
-    public bool IsPartial { get; } = IsPartial;
-    public bool IsStruct { get; } = IsStruct;
-    public Rename Rename { get; } = Rename;
-    public ImmutableArray<ConstructorData> Constructors { get; } = Constructors;
-    public InitializerData InitializerData { get; } = InitializerData;
+    internal string Name { get; } = Name;
+    internal string Namespace { get; } = Namespace;
+    internal bool IsPartial { get; } = IsPartial;
+    internal bool IsStruct { get; } = IsStruct;
+    internal Rename Rename { get; } = Rename;
+    internal ImmutableArray<ConstructorData> Constructors { get; } = Constructors;
+    internal InitializerData InitializerData { get; } = InitializerData;
 }

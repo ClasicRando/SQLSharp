@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace SQLSharp.Generator.Types;
 
 [Generator]
-public class WrapperTypeGenerator : IIncrementalGenerator
+internal class WrapperTypeGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -123,6 +123,10 @@ public class WrapperTypeGenerator : IIncrementalGenerator
             isPartial,
             hasNonDefaultConstructor,
             isStruct,
-            InnerValue: new InnerValueData(valueName, innerTypeName));
+            InnerValue: new InnerValueData(
+                valueName,
+                innerTypeName,
+                innerType.TypeKind is TypeKind.Array or TypeKind.Class,
+                innerType.NullableAnnotation == NullableAnnotation.Annotated));
     }
 }

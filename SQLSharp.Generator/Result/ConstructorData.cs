@@ -3,11 +3,11 @@ using Microsoft.CodeAnalysis;
 
 namespace SQLSharp.Generator.Result;
 
-public record ConstructorData(ImmutableArray<FieldData> Parameters)
+internal record ConstructorData(ImmutableArray<FieldData> Parameters)
 {
-    public ImmutableArray<FieldData> Parameters { get; } = Parameters;
+    internal ImmutableArray<FieldData> Parameters { get; } = Parameters;
 
-    public static ConstructorData FromMethodSymbol(
+    internal static ConstructorData FromMethodSymbol(
         IMethodSymbol methodSymbol,
         INamedTypeSymbol columnAttribute)
     {
