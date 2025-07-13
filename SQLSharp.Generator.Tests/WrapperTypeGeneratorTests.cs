@@ -9,7 +9,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct BytesWrapper(byte[] inner)
                               {
                                   internal byte[] Inner { get; } = inner;
@@ -25,10 +25,58 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper(int inner)
                               {
                                   internal int Inner { get; } = inner;
+                              }
+                              """;
+
+        return TestHelper.VerifyWrapperTypeGenerator(source);
+    }
+    
+    [Fact]
+    public Task Should_GenerateWrapperIDbDecodeImplementationCorrectly_when_StructTypeWithConstructorNonArrayNullableInnerValueType()
+    {
+        const string source = """
+                              using SQLSharp.Generator.Types;
+
+                              [WrapperType]
+                              internal readonly partial struct IntWrapper(int? inner)
+                              {
+                                  internal int? Inner { get; } = inner;
+                              }
+                              """;
+
+        return TestHelper.VerifyWrapperTypeGenerator(source);
+    }
+    
+    [Fact]
+    public Task Should_GenerateWrapperIDbDecodeImplementationCorrectly_when_StructTypeWithConstructorNonArrayNullableInnerRefType()
+    {
+        const string source = """
+                              using SQLSharp.Generator.Types;
+
+                              [WrapperType]
+                              internal readonly partial struct StringWrapper(string? inner)
+                              {
+                                  internal string? Inner { get; } = inner;
+                              }
+                              """;
+
+        return TestHelper.VerifyWrapperTypeGenerator(source);
+    }
+    
+    [Fact]
+    public Task Should_GenerateWrapperIDbDecodeImplementationCorrectly_when_StructTypeWithConstructorNonArrayNotNullInnerRefType()
+    {
+        const string source = """
+                              using SQLSharp.Generator.Types;
+
+                              [WrapperType]
+                              internal readonly partial struct StringWrapper(string inner)
+                              {
+                                  internal string Inner { get; } = inner;
                               }
                               """;
 
@@ -41,7 +89,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper(int inner)
                               {
                                   internal readonly int _inner = inner;
@@ -57,7 +105,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct BytesWrapper
                               {
                                   internal byte[] Inner { get; init; }
@@ -73,7 +121,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper
                               {
                                   internal int Inner { get; init; }
@@ -89,7 +137,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal partial class BytesWrapper(byte[] inner)
                               {
                                   internal byte[] Inner { get; } = inner;
@@ -105,7 +153,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal partial class IntWrapper(int inner)
                               {
                                   internal int Inner { get; } = inner;
@@ -121,7 +169,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal partial class IntWrapper(int inner)
                               {
                                   internal readonly int _inner = inner;
@@ -137,7 +185,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal partial class BytesWrapper
                               {
                                   internal byte[] Inner { get; init; }
@@ -153,7 +201,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal partial class IntWrapper
                               {
                                   internal int Inner { get; init; }
@@ -169,7 +217,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper
                               {
                                   internal int _inner;
@@ -186,7 +234,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper
                               {
                                   internal int Inner { get; set; }
@@ -203,7 +251,7 @@ public class WrapperTypeGeneratorTests
         const string source = """
                               using SQLSharp.Generator.Types;
 
-                              [WrapperTypeAttribute]
+                              [WrapperType]
                               internal readonly partial struct IntWrapper
                               {
                                   internal int _inner;

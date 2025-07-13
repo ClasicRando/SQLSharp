@@ -99,7 +99,9 @@ internal class WrapperTypeGenerator : IIncrementalGenerator
             valueName = properties[0].Name;
             innerType = properties[0].Type;
         }
-
+        
+        var isNullable = innerType.NullableAnnotation == NullableAnnotation.Annotated;
+        var isRefType = innerType.TypeKind is TypeKind.Array or TypeKind.Class;
         string innerTypeSimpleName;
         string innerTypeNamespace;
         if (innerType is IArrayTypeSymbol arrayTypeSymbol)
@@ -110,7 +112,9 @@ internal class WrapperTypeGenerator : IIncrementalGenerator
         else
         {
             innerTypeNamespace = innerType.ContainingNamespace.GetFullNamespaceName();
-            innerTypeSimpleName = innerType.Name;
+            innerTypeSimpleName = isNullable && !isRefType
+                ? ((INamedTypeSymbol)innerType).TypeArguments.First().Name
+                : innerType.Name;
         }
 
         var innerTypeName = string.IsNullOrEmpty(innerTypeNamespace)
@@ -127,6 +131,6 @@ internal class WrapperTypeGenerator : IIncrementalGenerator
                 valueName,
                 innerTypeName,
                 innerType.TypeKind is TypeKind.Array or TypeKind.Class,
-                innerType.NullableAnnotation == NullableAnnotation.Annotated));
+                isNullable));
     }
 }

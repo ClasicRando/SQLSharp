@@ -55,15 +55,17 @@ internal record FieldData(
                 }
             }
         }
+        
         var isNullable = symbol.NullableAnnotation == NullableAnnotation.Annotated;
-        var typeName = isNullable
+        var isRefType = symbol.Type.TypeKind is TypeKind.Array or TypeKind.Class;
+        var typeName = isNullable && !isRefType
             ? ((INamedTypeSymbol)symbol.Type).TypeArguments.First().Name
             : symbol.Type.Name;
         var typeData = new FieldTypeData(
             typeName,
             symbol.Type.ContainingNamespace.GetFullNamespaceName(),
-            symbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            symbol.NullableAnnotation == NullableAnnotation.Annotated,
+            isRefType,
+            isNullable,
             symbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
         return new FieldData(
             symbol.Name,
@@ -114,14 +116,15 @@ internal record FieldData(
             }
         }
         var isNullable = parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated;
-        var typeName = isNullable
+        var isRefType = parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class;
+        var typeName = isNullable && !isRefType
             ? ((INamedTypeSymbol)parameterSymbol.Type).TypeArguments.First().Name
             : parameterSymbol.Type.Name;
         var typeData = new FieldTypeData(
             typeName,
             parameterSymbol.Type.ContainingNamespace.GetFullNamespaceName(),
-            parameterSymbol.Type.TypeKind is TypeKind.Array or TypeKind.Class,
-            parameterSymbol.NullableAnnotation == NullableAnnotation.Annotated,
+            isRefType,
+            isNullable,
             parameterSymbol.Type.AllInterfaces.Any(t => t.Name == "IDbDecode"));
         return new FieldData(
             parameterSymbol.Name,
