@@ -7,6 +7,14 @@
         <Nullable>enable</Nullable>
         <IsTrimable>true</IsTrimable>
         <EnableAotAnalyzer>true</EnableAotAnalyzer>
+        <AssemblyName>SQLSharp</AssemblyName>
+        <Title>SQLSharp</Title>
+        <PackageTags>micro-orm;sql;ado.net</PackageTags>
+        <Description>Micro-ORM over ADO.Net with compile time guarentees for row and type mapping</Description>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>SQLSharp</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Steven Thomson</Authors>
     </PropertyGroup>
 
     <ItemGroup>

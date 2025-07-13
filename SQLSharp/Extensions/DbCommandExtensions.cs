@@ -7,8 +7,21 @@ using SQLSharp.Types;
 
 namespace SQLSharp.Extensions;
 
-public static class DbCommandExtensions
+internal static class DbCommandExtensions
 {
+    /// <summary>
+    /// Add parameters to this command object. This will only succeed if the parameters are a:
+    /// <list type="bullet">
+    ///     <item><see cref="SqlSharpParameters"/></item>
+    ///     <item><see cref="KeyValuePair{TKey,TValue}"/>s</item>
+    ///     <item>an anonymous type</item>
+    /// </list>
+    /// </summary>
+    /// <param name="command">command to add parameters to</param>
+    /// <param name="parameters">opaque container for command parameters</param>
+    /// <exception cref="SqlSharpException">
+    /// if the parameters type cannot be used to populate a command
+    /// </exception>
     internal static void AddParameters(this IDbCommand command, object parameters)
     {
         Type type = parameters.GetType();
@@ -31,7 +44,7 @@ public static class DbCommandExtensions
             }
             default:
             {
-                if (CheckIfAnonymousType(type))
+                if (IsAnonymousType(type))
                 {
                     foreach (PropertyInfo propertyInfo in type.GetProperties())
                     {
@@ -53,7 +66,7 @@ public static class DbCommandExtensions
         }
     }
 
-    private static bool CheckIfAnonymousType(Type type)
+    private static bool IsAnonymousType(Type type)
     {
         ArgumentNullException.ThrowIfNull(type);
         return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
@@ -63,6 +76,14 @@ public static class DbCommandExtensions
                && type.Attributes.HasFlag(TypeAttributes.NotPublic);
     }
 
+    /// <summary>
+    /// Encodes a value of any type into the parameter. When the value is of type
+    /// <see cref="IDbEncode"/>, this method defers to that method call. Otherwise, the value is
+    /// checked to find a compatible base SQL type to associate the parameter to and finally the
+    /// value is added as is to the parameter.
+    /// </summary>
+    /// <param name="parameter">parameter to add the value</param>
+    /// <param name="value">opaque value to add to the parameter</param>
     private static void EncodeValue(ref IDbDataParameter parameter, object? value)
     {
         switch (value)
@@ -74,10 +95,11 @@ public static class DbCommandExtensions
                 encode.Encode(ref parameter);
                 break;
             default:
-                if (GetDbType(parameter) is {} dbType)
+                if (GetDbType(parameter) is { } dbType)
                 {
                     parameter.DbType = dbType;
                 }
+
                 parameter.Value = value;
                 break;
         }
@@ -106,5 +128,32 @@ public static class DbCommandExtensions
             Guid => DbType.Guid,
             _ => null,
         };
+    }
+
+    /// <summary>
+    /// Initiate a command with the provided <paramref name="commandProperties"/>
+    /// </summary>
+    /// <param name="command">command to initialize</param>
+    /// <param name="commandProperties">properties to apply to the command</param>
+    /// <typeparam name="TConnection">connection type</typeparam>
+    /// <typeparam name="TTransaction">transaction type</typeparam>
+    internal static void PrepareCommand<TConnection, TTransaction>(
+        this IDbCommand command,
+        SqlSharpCommand<TConnection, TTransaction> commandProperties)
+        where TConnection : IDbConnection
+        where TTransaction : IDbTransaction
+    {
+        command.CommandText = commandProperties.Query;
+        command.CommandType = commandProperties.CommandType;
+        command.Transaction = commandProperties.Transaction;
+        if (commandProperties.QueryTimeout.HasValue)
+        {
+            command.CommandTimeout = commandProperties.QueryTimeout.Value;
+        }
+
+        if (commandProperties.Parameters is not null)
+        {
+            command.AddParameters(commandProperties.Parameters);
+        }
     }
 }

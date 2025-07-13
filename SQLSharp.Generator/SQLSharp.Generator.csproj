@@ -8,9 +8,14 @@
         <ImplicitUsings>true</ImplicitUsings>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-<!--        <IsPackable>true</IsPackable>-->
-<!--        <IsRoslynComponent>true</IsRoslynComponent>-->
-<!--        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
+        <AssemblyName>SQLSharp Generator</AssemblyName>
+        <Title>SQLSharp Generator</Title>
+        <PackageTags>micro-orm;sql;ado.net;source-generator</PackageTags>
+        <Description>Source generation extension to SQLSharp that allows for generating row and type parsers</Description>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>SQLSharp Generator</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Steven Thomson</Authors>
     </PropertyGroup>
 
     <ItemGroup>

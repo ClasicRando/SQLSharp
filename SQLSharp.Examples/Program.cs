@@ -1,4 +1,6 @@
-﻿using Npgsql;
+﻿using System.Data;
+using Npgsql;
+using SQLSharp.Command;
 using SQLSharp.Extensions;
 using SQLSharp.Generator.Result;
 using SQLSharp.Generator.Types;
@@ -73,6 +75,24 @@ await foreach (InitRow row in initRows)
     Console.WriteLine(row.ToString());
 }
 
+await connection.ExecuteAsync(
+    """
+    CREATE OR REPLACE PROCEDURE public.test_proc_ext(in out int, in out text)
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        $1 := COALESCE($1,0) + 1;
+        $2 := LTRIM($2 || ',' || $1, ',');
+    END;
+    $$;
+    """);
+SqlSharpParameters parameters = new();
+parameters.Add("IntVar", 1, ParameterDirection.InputOutput);
+parameters.Add("TextVar", null, ParameterDirection.InputOutput);
+await connection.ExecuteAsync(query: "CALL public.test_proc_ext(@IntVar::int, @TextVar::text)", parameters: parameters);
+Console.WriteLine(parameters.Get<int>("IntVar"));
+Console.WriteLine(parameters.Get<string?>("TextVar") is null);
+
 internal readonly record struct Row : IFromRow<Row>
 {
     public UserId Id { get; init; }
@@ -115,11 +135,11 @@ internal readonly partial struct GeneratedRow(Guid id, [Column(Flatten = true)] 
 
 namespace Examples.Test
 {
-    internal readonly record struct IntValue(int inner) : IDbDecode<IntValue>
+    internal readonly record struct IntValue(int Inner) : IDbDecode<IntValue>
     {
         public static IntValue Decode(IDataRow row, int column)
         {
-            return new IntValue(row.GetField<int>(column));
+            return new IntValue(row.GetFieldNotNull<int>(column));
         }
     }
 }

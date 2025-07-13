@@ -1,31 +1,43 @@
+using System.Data;
 using SQLSharp.Exceptions;
 
 namespace SQLSharp.Result;
 
-internal class SqlSharpDataRow : IDataRow
+/// <summary>
+/// Implementation of <see cref="IDataRow"/> as a light wrapper over <see cref="IDataRecord"/>.
+/// Decodes any extracted DBNull.Value values as null.
+/// </summary>
+internal sealed class SqlSharpDataRow : IDataRow
 {
-    private readonly List<string> _fieldNames;
-    private readonly object[] _values;
+    private readonly IDataRecord _dataRecord;
 
-    public SqlSharpDataRow(List<string> fieldNames, object[] values)
+    public SqlSharpDataRow(IDataRecord dataRecord)
     {
-        _fieldNames = fieldNames ?? throw new ArgumentNullException(nameof(fieldNames));
-        _values = values ?? throw new ArgumentNullException(nameof(values));
+        _dataRecord = dataRecord;
     }
     
     public int IndexOf(string fieldName)
     {
-        ArgumentNullException.ThrowIfNull(fieldName);
-        var index = _fieldNames.IndexOf(fieldName);
+        var index = _dataRecord.GetOrdinal(fieldName);
         if (index != -1)
         {
             return index;
         }
-        
-        var fieldNames = string.Join(",", _fieldNames.Select(n => $"\"{n}\""));
+
+        var fieldNames = string.Join(
+            ",",
+            Enumerable.Range(0, _dataRecord.FieldCount)
+                .Select(i => $"\"{_dataRecord.GetName(i)}\""));
         throw new SqlSharpException(
             $"Could not find field '{fieldName}' in result. Fields names are, {fieldNames}");
     }
 
-    public object this[int index] => _values[index];
+    public object? this[int index]
+    {
+        get
+        {
+            var value = _dataRecord[index];
+            return value is DBNull ? null : value;
+        }
+    }
 }

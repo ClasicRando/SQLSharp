@@ -2,6 +2,11 @@ using System.Data;
 
 namespace SQLSharp.Command;
 
+/// <summary>
+/// SQL Command object. Generic over all variants of connection and transaction type 
+/// </summary>
+/// <typeparam name="TConnection">connection type</typeparam>
+/// <typeparam name="TTransaction">transaction type</typeparam>
 internal class SqlSharpCommand<TConnection, TTransaction> where TConnection : IDbConnection
     where TTransaction : IDbTransaction
 {
@@ -9,7 +14,7 @@ internal class SqlSharpCommand<TConnection, TTransaction> where TConnection : ID
     internal string Query { get; }
     internal object? Parameters { get; }
     internal TTransaction? Transaction { get; }
-    internal int QueryTimeout { get; }
+    internal int? QueryTimeout { get; }
     internal CommandType CommandType { get; }
 
     internal SqlSharpCommand(
@@ -21,11 +26,13 @@ internal class SqlSharpCommand<TConnection, TTransaction> where TConnection : ID
         CommandType? commandType
     )
     {
-        Connection = connection ?? throw new ArgumentNullException(nameof(connection));
-        Query = query ?? throw new ArgumentNullException(nameof(query));
+        ArgumentNullException.ThrowIfNull(connection);
+        ArgumentNullException.ThrowIfNull(query);
+        Connection = connection;
+        Query = query;
         Parameters = parameters;
         Transaction = transaction;
-        QueryTimeout = queryTimeout ?? 30;
+        QueryTimeout = queryTimeout;
         CommandType = commandType ?? CommandType.Text;
     }
 }
